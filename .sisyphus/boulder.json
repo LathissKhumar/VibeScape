@@ -1,0 +1,23 @@
+{
+  "active_plan": "/home/lathiss/Projects/VibeScape/.sisyphus/plans/vibedna-production-architecture.md",
+  "started_at": "2026-05-18T19:32:42.102Z",
+  "session_ids": [
+    "ses_1c417616bffeV4WTTxPLamfhz7"
+  ],
+  "session_origins": {
+    "ses_1c417616bffeV4WTTxPLamfhz7": "direct"
+  },
+  "plan_name": "vibedna-production-architecture",
+  "agent": "atlas",
+  "task_sessions": {
+    "todo:1": {
+      "task_key": "todo:1",
+      "task_label": "1",
+      "task_title": "Set up Upstash Redis + cache client library",
+      "session_id": "ses_1c36be638ffexAFmo5vodxPDZr",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "updated_at": "2026-05-18T19:33:28.845Z"
+    }
+  }
+}
