@@ -18,4 +18,29 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Image optimization / remote patterns for CDN usage
+// Keep conservative allowlist to avoid unsafe remote fetching.
+const imageConfig = {
+  images: {
+    // allow Vercel's domains and common external providers we use
+    // prefer remotePatterns over domains (domains kept for backward-compatibility)
+    domains: ["images.unsplash.com", "cdn.sanity.io"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.vercel.app",
+      },
+      {
+        protocol: "https",
+        hostname: "i.scdn.co", // spotify content images
+      },
+    ],
+    // optional: device sizes used by the app
+    deviceSizes: [320, 420, 768, 1024, 1200, 1600],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+  },
+};
+
+const merged = Object.assign({}, nextConfig, imageConfig);
+
+export default merged;

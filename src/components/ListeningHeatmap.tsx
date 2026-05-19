@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import { BarChart2 } from "lucide-react";
 import type { SpotifyAudioFeatures } from "@/lib/spotify";
 
 
@@ -186,22 +187,17 @@ export default function ListeningHeatmap({
           transition={{ duration: 0.6, delay: 0.2 }}
           className="md:col-span-8 glass-card rounded-3xl p-8 flex flex-col relative group"
         >
-          <div className="flex justify-between items-start mb-8">
-            <div>
-              <h3 className="font-[var(--font-outfit)] text-2xl font-semibold text-white mb-1">
-                Temporal Spikes
-              </h3>
-              <p className="text-sm text-on-surface-variant">
-                Real-time intensity peaks
-              </p>
+            <div className="flex justify-between items-start mb-8">
+              <div>
+                <h3 className="font-[var(--font-outfit)] text-2xl font-semibold text-white mb-1">
+                  Temporal Spikes
+                </h3>
+                <p className="text-sm text-on-surface-variant">
+                  Real-time intensity peaks
+                </p>
+              </div>
+            <BarChart2 className="w-6 h-6 text-primary" />
             </div>
-            <span
-              className="material-symbols-outlined text-primary"
-              style={{ fontVariationSettings: "'FILL' 1" }}
-            >
-              insights
-            </span>
-          </div>
 
           {/* SVG Line Chart */}
           <div className="relative w-full h-48 mt-auto">

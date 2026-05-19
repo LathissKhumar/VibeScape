@@ -1,0 +1,7 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e3]:
+      - generic [ref=e5]: VibeDNA
+    - main [ref=e6]:
+      - img [ref=e10]
+  - region "Notifications alt+T"

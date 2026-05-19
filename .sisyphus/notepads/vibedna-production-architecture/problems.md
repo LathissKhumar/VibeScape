@@ -1,0 +1,16 @@
+- Problem: Telemetry will be inert until packages are installed and env vars configured. This is intentional to keep builds non-breaking. Track enabling steps in this file.
+- QStash: Workers and real job processing logic not implemented; route only provides signature verification when enabled.
+- Cache scaffold assumptions:
+  - Warm-tier uses raw SQL via db.execute?. This assumes the db export exposes an execute method compatible with this call; Drizzle's pool may differ. This is an intentional minimal scaffold. Replace with Drizzle queries after installing drizzle-orm and pg.
+  - Cold-tier is a placeholder and must be implemented when long-term archival is required.
+- Schema migration: added db/migrations/0001_create_core_schema.sql. Note: applying migrations requires database access and optional drizzle-kit; file is plain SQL to remain build-safe.
+- Testing infra: Vitest is present and working. React Testing Library and Playwright are recommended but not installed; tests covering DOM or E2E require those packages.
+- API Gateway: Spotify proxy route added. Note: route uses token from Authorization header — be careful exposing tokens. Consider server-side session tokens or token-rotation in production. Also, the edge runtime may have stricter APIs for Postgres/Drizzle access; this route uses only http and cache/rate-limiter, which are edge-compatible if Redis provides REST endpoints.
+- Event system: events written to `events` table via raw SQL when DB available. This persists events in a minimal way but will need Drizzle refactor later for type-safety.
+- Async workers: scaffolds added for personality, analytics, embedding. They emit generic events and are intended to be invoked via QStash when available. Ensure QSTASH_* env vars are set and @upstash/qstash installed to enable enqueueing.
+- Delta sync engine: added minimal snapshot/delta logic to src/lib/sync/spotifySync.ts. It's intentionally minimal and uses raw SQL for snapshots; may need Drizzle refactor for production.
+ - Data layer: spotify cache now prefers coreCache (Redis/Postgres). Supabase is retained as a fallback/backfill to avoid data loss during migration. Verify Supabase schemas and consider removing Supabase once warm-tier persistence is validated.
+
+- Problem: Dynamic imports (next/dynamic with ssr:false) don't render in jsdom test environment. This affects ListeningHeatmapSection tests. Mitigation: mock next/dynamic and test wrapper behavior instead of dynamic content. A better approach would be to make the dynamic import a prop or HOC that tests can override.
+- Problem: "Refresh Analysis" button in AIInsightsSheet is disabled with cursor-not-allowed. The actual refresh logic depends on QStash async workers (Tasks 11, 15) which are not yet integrated into the dashboard flow. Needs implementation when the async worker pipeline is complete.
+- Problem: The Galaxy section still uses inline computed values (avgValence, topGenres, topArtists.length) from DashboardClient.tsx. When Galaxy is extracted in Task 23, these computations will need to move there or to a shared hook.

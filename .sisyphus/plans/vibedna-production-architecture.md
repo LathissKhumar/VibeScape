@@ -256,7 +256,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
 
 ## TODOs
 
-- [ ] 1. Set up Upstash Redis + cache client library
+- [x] 1. Set up Upstash Redis + cache client library
 
   **What to do**:
   - Sign up for Upstash Redis (free tier: 10MB, 30 req/s, 1 database)
@@ -336,7 +336,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES (groups with Tasks 5, 6)
   - Message: `infra(redis): set up Upstash Redis + multi-tier cache layer`
 
-- [ ] 2. Set up Neon PostgreSQL + Drizzle ORM + schema migrations
+- [x] 2. Set up Neon PostgreSQL + Drizzle ORM + schema migrations
 
   **What to do**:
   - Sign up for Neon PostgreSQL (free tier: 0.5GB, 100 hrs/month, pgvector enabled)
@@ -423,7 +423,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES (groups with Task 7)
   - Message: `infra(db): set up Neon PostgreSQL + Drizzle ORM + schema migration`
 
-- [ ] 3. Set up Sentry + OpenTelemetry
+- [x] 3. Set up Sentry + OpenTelemetry
 
   **What to do**:
   - Sign up for Sentry (free tier: 5K events/month)
@@ -509,7 +509,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES (groups with Task 14)
   - Message: `infra(monitoring): set up Sentry + OpenTelemetry`
 
-- [ ] 4. Set up QStash + async worker scaffolding
+- [x] 4. Set up QStash + async worker scaffolding
 
   **What to do**:
   - Sign up for Upstash QStash (free tier: 10K requests/month) — uses same account as Redis
@@ -607,7 +607,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES (groups with Task 11)
   - Message: `infra(queue): set up QStash + async worker scaffolding`
 
-- [ ] 5. Create core cache layer (multi-tier: hot/warm/cold)
+- [x] 5. Create core cache layer (multi-tier: hot/warm/cold)
 
   **What to do**:
   - Create `src/lib/cache/strategy.ts` with multi-tier caching:
@@ -701,7 +701,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES (groups with Task 1)
   - Message: `feat(cache): multi-tier cache strategy (hot/warm/cold)`
 
-- [ ] 6. Create Redis rate limiter (sliding window)
+- [x] 6. Create Redis rate limiter (sliding window)
 
   **What to do**:
   - Create `src/lib/middleware/rate-limiter.ts`:
@@ -780,7 +780,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES (groups with Task 1)
   - Message: `feat(rate-limit): Redis sliding window rate limiter`
 
-- [ ] 7. Create database schema — users, tracks, events, snapshots
+- [x] 7. Create database schema — users, tracks, events, snapshots
 
   **What to do**:
   - Flesh out `src/lib/db/schema.ts` (from Task 2) with full Drizzle schema:
@@ -865,7 +865,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES (groups with Task 2)
   - Message: `feat(db): database schema — users, tracks, events, snapshots`
 
-- [ ] 8. Test infrastructure (Vitest + RTL + Playwright)
+- [x] 8. Test infrastructure (Vitest + RTL + Playwright)
 
   **What to do**:
   - Same as Task 1 from the original UI plan:
@@ -927,7 +927,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES
   - Message: `test(setup): Vitest + React Testing Library + Playwright`
 
-- [ ] 9. API Gateway — Spotify proxy routes with rate limiting + caching
+- [x] 9. API Gateway — Spotify proxy routes with rate limiting + caching
 
   **What to do**:
   - Create `src/app/api/spotify/top-artists/route.ts`:
@@ -1025,7 +1025,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES
   - Message: `feat(gateway): API Gateway — Spotify proxy routes with rate limiting + caching`
 
-- [ ] 10. Event system — typed events
+- [x] 10. Event system — typed events
 
   **What to do**:
   - Create `src/lib/events/types.ts` with typed event definitions:
@@ -1114,7 +1114,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES (groups with Task 14)
   - Message: `feat(events): event system — typed events with DB + Sentry + QStash consumers`
 
-- [ ] 11. Async workers — Personality, Analytics, Embedding (QStash)
+- [x] 11. Async workers — Personality, Analytics, Embedding (QStash)
 
   **What to do**:
   - Flesh out the 4 worker routes created in Task 4 with real logic:
@@ -1215,7 +1215,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES (groups with Task 4)
   - Message: `feat(workers): async workers — Personality, Analytics, Embedding via QStash`
 
-- [ ] 12. Incremental sync — delta sync engine for Spotify data
+- [x] 12. Incremental sync — delta sync engine for Spotify data
 
   **What to do**:
   - Create `src/lib/sync/incremental-sync.ts`:
@@ -1308,7 +1308,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES
   - Message: `feat(sync): incremental sync engine — full + delta modes for Spotify data`
 
-- [ ] 13. Refactor data layer — migrate from Supabase cache to Redis + PostgreSQL
+- [x] 13. Refactor data layer — migrate from Supabase cache to Redis + PostgreSQL
 
   **What to do**:
   - Create `src/lib/data/index.ts` — Unified data access layer:
@@ -1393,7 +1393,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES
   - Message: `refactor(data): migrate from Supabase cache to Redis + PostgreSQL multi-tier`
 
-- [ ] 14. Observability dashboards — Sentry custom metrics + cache hit ratio
+- [x] 14. Observability dashboards — Sentry custom metrics + cache hit ratio
 
   **What to do**:
   - Build Sentry dashboards:
@@ -1491,7 +1491,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES (groups with Task 3)
   - Message: `feat(observability): Sentry dashboards + cache metrics + health endpoint`
 
-- [ ] 15. AI pipeline optimization — structured metrics → compact prompt → fingerprint
+- [x] 15. AI pipeline optimization — structured metrics → compact prompt → fingerprint
 
   **What to do**:
   - Refactor `src/lib/gemini.ts` for async + optimized pipeline:
@@ -1598,7 +1598,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES
   - Message: `feat(ai): AI pipeline optimization — structured metrics, compact prompt, async generation`
 
-- [ ] 16. Precomputed analytics — materialized views + nightly aggregation
+- [x] 16. Precomputed analytics — materialized views + nightly aggregation
 
   **What to do**:
   - Create `src/lib/analytics/materialized-views.sql`:
@@ -1682,7 +1682,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES (groups with Task 18)
   - Message: `feat(analytics): precomputed analytics — materialized views + nightly aggregation`
 
-- [ ] 17. Vector embeddings — pgvector setup + genre/profile embeddings
+- [x] 17. Vector embeddings — pgvector setup + genre/profile embeddings
 
   **What to do**:
   - Enable pgvector extension in Neon database:
@@ -1775,7 +1775,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES (groups with Task 18)
   - Message: `feat(vectors): vector embeddings — pgvector setup + genre/profile embedding`
 
-- [ ] 18. Recommendation engine — cosine similarity, vibe matching, music twins
+- [x] 18. Recommendation engine — cosine similarity, vibe matching, music twins
 
   **What to do**:
   - Create `src/lib/recommend/index.ts`:
@@ -1868,7 +1868,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES (groups with Task 17)
   - Message: `feat(recommend): recommendation engine — cosine similarity, vibe matching, music twins`
 
-- [ ] 19. Icon standardization (material-symbols → lucide-react)
+- [x] 19. Icon standardization (material-symbols → lucide-react)
 
   **What to do**:
   - Same as Task 2 from the original plan:
@@ -1913,7 +1913,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES
   - Message: `refactor(icons): replace material-symbols-outlined with lucide-react`
 
-- [ ] 20. Shared hooks + utility components
+- [x] 20. Shared hooks + utility components
 
   **What to do**:
   - Create `src/hooks/` directory with:
@@ -1973,7 +1973,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES
   - Message: `feat(hooks): shared hooks and utility components`
 
-- [ ] 21. Landing page section split + redesign
+- [x] 21. Landing page section split + redesign
 
   **What to do**:
   - Split `src/app/page.tsx` (~329 lines) into section components in `src/components/landing/`:
@@ -2046,7 +2046,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES
   - Message: `feat(landing): cinematic landing page with hero, archetype cards, galaxy preview`
 
-- [ ] 22. Dashboard section split + redesign
+- [x] 22. Dashboard section split + redesign
 
   **What to do**:
   - Split `DashboardClient.tsx` (~509 lines) into `src/components/dashboard/`:
@@ -2136,7 +2136,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES
   - Message: `feat(dashboard): complete dashboard restructure with personality engine, heatmaps, radar, AI sheet`
 
-- [ ] 23. Galaxy enhancement (bloom, constellations, click-to-focus, orbital nav)
+- [x] 23. Galaxy enhancement (bloom, constellations, click-to-focus, orbital nav)
 
   **What to do**:
   - Enhance `src/components/Galaxy.tsx`:
@@ -2387,7 +2387,7 @@ Critical Path: Tasks 1→5→6→7 → Tasks 9→10→11→12→13→14 → Task
   **Commit**: YES
   - Message: `feat(timeline): listening timeline with genre evolution and emotional transitions`
 
-- [ ] 27. Feature flags (Redis-backed toggle system)
+- [x] 27. Feature flags (Redis-backed toggle system)
 
   **What to do**:
   - Create `src/lib/feature-flags/index.ts`:

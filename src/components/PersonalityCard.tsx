@@ -6,7 +6,7 @@ import { useRef, useCallback, useState } from "react";
 import type { Personality } from "@/types/next-auth";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DownloadIcon } from "lucide-react";
+import { DownloadIcon, Fingerprint } from "lucide-react";
 
 const AURA_COLORS = [
   { name: "Purple", value: "#A855F7", class: "bg-neon-purple" },
@@ -57,17 +57,9 @@ export default function PersonalityCard({ personality }: { personality: Personal
 
           <CardContent className="relative z-10 flex flex-col h-full p-8">
             {/* Badge */}
-            <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-6 neon-glow-primary">
-              <span
-                className="material-symbols-outlined text-3xl"
-                style={{
-                  fontVariationSettings: "'FILL' 1",
-                  color: selectedColor,
-                }}
-              >
-                fingerprint
-              </span>
-            </div>
+              <div className="w-14 h-14 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-6 neon-glow-primary">
+               <Fingerprint className="w-7 h-7" style={{ color: selectedColor }} />
+             </div>
 
             <span className="text-xs uppercase tracking-[0.1em] text-outline mb-2 font-semibold">
               Your Music Archetype

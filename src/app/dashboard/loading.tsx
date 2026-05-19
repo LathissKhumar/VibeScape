@@ -60,12 +60,12 @@ export default function DashboardLoading() {
           {/* Galaxy skeleton */}
           <div className="md:col-span-12 mt-20 glass-card rounded-3xl border border-white/5 h-[700px] relative overflow-hidden flex items-center justify-center">
             <div className="absolute inset-0 opacity-10 blur-[100px] bg-gradient-to-tr from-neon-cyan to-neon-purple" />
-            <div className="text-center">
-              <span className="material-symbols-outlined text-6xl text-neon-purple/40 block mb-4 animate-pulse">
-                public
-              </span>
-              <Skeleton className="w-64 h-6 rounded-xl mx-auto" />
-            </div>
+              <div className="text-center">
+                <svg className="w-16 h-16 text-neon-purple/40 block mb-4 animate-pulse" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20M12 2v20" />
+                </svg>
+                <Skeleton className="w-64 h-6 rounded-xl mx-auto" />
+              </div>
           </div>
         </div>
       </main>

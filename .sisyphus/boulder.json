@@ -18,6 +18,75 @@
       "agent": "Sisyphus-Junior",
       "category": "quick",
       "updated_at": "2026-05-18T19:33:28.845Z"
+    },
+    "todo:2": {
+      "task_key": "todo:2",
+      "task_label": "2",
+      "task_title": "Set up Neon PostgreSQL + Drizzle ORM + schema migrations",
+      "session_id": "ses_1c35ec615ffevKNIwGgkCFyTuZ",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "updated_at": "2026-05-18T19:49:48.669Z"
+    },
+    "todo:18": {
+      "task_key": "todo:18",
+      "task_label": "18",
+      "task_title": "Recommendation engine — cosine similarity, vibe matching, music twins",
+      "session_id": "ses_1c30f57b5ffeSVlv8O0ZhVyW4O",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-05-18T21:39:05.934Z"
+    },
+    "todo:19": {
+      "task_key": "todo:19",
+      "task_label": "19",
+      "task_title": "Icon standardization (material-symbols → lucide-react)",
+      "session_id": "ses_1c2ebef38ffe1DQneM6ESgWNAl",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "updated_at": "2026-05-18T22:22:28.008Z"
+    },
+    "todo:20": {
+      "task_key": "todo:20",
+      "task_label": "20",
+      "task_title": "Shared hooks + utility components",
+      "session_id": "ses_1c234ce70ffeLWJD06DOeYEtz2",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "updated_at": "2026-05-19T01:14:50.117Z"
+    },
+    "todo:21": {
+      "task_key": "todo:21",
+      "task_label": "21",
+      "task_title": "Landing page section split + redesign",
+      "session_id": "ses_1c1db9a94ffexKTcuUD1wKMJAB",
+      "agent": "general",
+      "updated_at": "2026-05-19T03:03:30.066Z"
+    },
+    "todo:22": {
+      "task_key": "todo:22",
+      "task_label": "22",
+      "task_title": "Dashboard section split + redesign",
+      "session_id": "ses_1c1c4d3ceffejtVTXb6di52kdK",
+      "agent": "oracle",
+      "updated_at": "2026-05-19T03:17:47.283Z"
+    },
+    "todo:23": {
+      "task_key": "todo:23",
+      "task_label": "23",
+      "task_title": "Galaxy enhancement (bloom, constellations, click-to-focus, orbital nav)",
+      "session_id": "ses_1c1a181caffelOrrLtEBSmreK3",
+      "agent": "general",
+      "updated_at": "2026-05-19T03:57:56.931Z"
+    },
+    "todo:24": {
+      "task_key": "todo:24",
+      "task_label": "24",
+      "task_title": "Shareable personality card with enhanced export",
+      "session_id": "ses_1c033c15dffeVnTLhXD6ppbbDG",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "updated_at": "2026-05-19T10:36:07.829Z"
     }
   }
 }

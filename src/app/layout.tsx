@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
+import Head from "next/head";
 import "./globals.css";
 import Providers from "@/components/Providers";
 import { Toaster } from "@/components/ui/sonner";
@@ -30,6 +31,15 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
+      <Head>
+        {/* Preconnect common critical origins (CDN, analytics, Spotify auth) */}
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://accounts.spotify.com" />
+        <link rel="dns-prefetch" href="https://accounts.spotify.com" />
+        {/* Hint to preconnect Vercel edge CDN (covers deployed assets) */}
+        <link rel="preconnect" href="https://vercel.com" />
+      </Head>
       <body
         className={`${inter.variable} ${outfit.variable} font-sans antialiased selection:bg-neon-purple selection:text-white`}
         style={{ fontFamily: "var(--font-inter), ui-sans-serif, system-ui, sans-serif" }}

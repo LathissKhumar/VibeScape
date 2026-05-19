@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import coreCache from "./cache";
 
 const SPOTIFY_API_BASE = "https://api.spotify.com/v1";
 const CACHE_TTL_MS = 1000 * 60 * 60 * 24;
@@ -50,44 +51,73 @@ export async function getCachedSpotifyData<T>(
   userId: string,
   fetcher: () => Promise<T>
 ): Promise<T> {
-  // Try to get from cache first
-  const { data: cacheData, error: cacheError } = await supabase
-    .from("spotify_cache")
-    .select("data, updated_at")
-    .eq("id", cacheKey)
-    .single();
-
-  if (!cacheError && cacheData) {
-    const updatedAt = new Date(cacheData.updated_at).getTime();
-    if (Date.now() - updatedAt < CACHE_TTL_MS) {
-      console.log(`Cache HIT for ${cacheKey}`);
-      return cacheData.data;
+  // Prefer Redis/Postgres cache via coreCache (hot/warm). Fallback to Supabase for stale read if present.
+  try {
+    const hot = await coreCache.get<T>(cacheKey);
+    if (hot !== null) {
+      // Cache HIT
+      console.log(`Cache HIT (coreCache) for ${cacheKey}`);
+      return hot as T;
     }
+  } catch (err) {
+    // ignore and try fallback
+  }
+
+  // If coreCache miss, try Supabase as a fallback to return fresh-ish cached data before fetching
+  let supabaseCache: any = null;
+  try {
+    const { data: cacheData, error: cacheError } = await supabase
+      .from("spotify_cache")
+      .select("data, updated_at")
+      .eq("id", cacheKey)
+      .single();
+
+    if (!cacheError && cacheData) {
+      const updatedAt = new Date(cacheData.updated_at).getTime();
+      if (Date.now() - updatedAt < CACHE_TTL_MS) {
+        console.log(`Cache HIT (supabase fallback) for ${cacheKey}`);
+        return cacheData.data;
+      }
+      supabaseCache = cacheData.data;
+    }
+  } catch (err) {
+    // ignore supabase errors
   }
 
   // Cache miss or expired, fetch fresh data
-  console.log(`Cache MISS or EXPIRED for ${cacheKey}`);
+  console.log(`Cache MISS for ${cacheKey}; fetching fresh`);
   try {
     const freshData = await fetcher();
 
-    // Store in cache
-    const { error: upsertError } = await supabase.from("spotify_cache").upsert({
-      id: cacheKey,
-      user_id: userId,
-      data: freshData,
-      updated_at: new Date().toISOString(),
-    });
+    // Store in coreCache (hot/warm) with TTL
+    const ex = Math.max(1, Math.floor(CACHE_TTL_MS / 1000));
+    try {
+      await coreCache.set<T>(cacheKey, freshData, { ex });
+    } catch (err) {
+      // ignore cache set failures
+    }
 
-    if (upsertError) {
-      console.error(`Failed to cache ${cacheKey}:`, upsertError);
+    // Also persist to Supabase for compatibility/backfill
+    try {
+      const { error: upsertError } = await supabase.from("spotify_cache").upsert({
+        id: cacheKey,
+        user_id: userId,
+        data: freshData,
+        updated_at: new Date().toISOString(),
+      });
+      if (upsertError) {
+        console.error(`Failed to cache ${cacheKey} in supabase:`, upsertError);
+      }
+    } catch (err) {
+      // ignore supabase upsert failures
     }
 
     return freshData;
   } catch (error) {
-    // If rate limited but we have stale cache, return stale cache
-    if (cacheData) {
-      console.warn(`Returning STALE cache for ${cacheKey} due to fetch error.`);
-      return cacheData.data;
+    // If fetch failed but we have supabaseCache (stale), return it
+    if (supabaseCache) {
+      console.warn(`Returning STALE supabase cache for ${cacheKey} due to fetch error.`);
+      return supabaseCache;
     }
     throw error;
   }
