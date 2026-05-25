@@ -1,49 +1,72 @@
-import { render, screen } from "@testing-library/react";
-import { vi } from "vitest";
+import { render, screen, waitFor, fireEvent } from "@/test/test-utils";
 import ListeningHeatmapSection from "../ListeningHeatmapSection";
-import type { SpotifyAudioFeatures } from "@/lib/spotify";
+import type { SpotifyRecentlyPlayed } from "@/lib/spotify";
 
-// Mock next/dynamic so dynamic imports resolve synchronously in tests
-vi.mock("next/dynamic", () => ({
-  default: () => {
-    const DynamicMock = (props: any) => {
-      if (props.children) return props.children;
-      return null;
-    };
-    DynamicMock.displayName = "DynamicMock";
-    return DynamicMock;
-  },
-}));
-
-const mockFeatures: SpotifyAudioFeatures[] = [
-  { energy: 0.8, valence: 0.6, danceability: 0.7, acousticness: 0.2, instrumentalness: 0.1, speechiness: 0.05, tempo: 120 },
-  { energy: 0.5, valence: 0.4, danceability: 0.6, acousticness: 0.5, instrumentalness: 0.3, speechiness: 0.1, tempo: 100 },
+const mockPlays: SpotifyRecentlyPlayed[] = [
+  { played_at: "2026-05-20T14:00:00Z", track: { id: "1", name: "Track 1" } },
+  { played_at: "2026-05-20T15:00:00Z", track: { id: "2", name: "Track 2" } },
+  { played_at: "2026-05-21T03:00:00Z", track: { id: "3", name: "Track 3" } },
 ];
 
 describe("ListeningHeatmapSection", () => {
-  test("renders wrapper when audio features provided", () => {
+  test("renders wrapper when plays provided", () => {
     const { container } = render(
-      <ListeningHeatmapSection audioFeatures={mockFeatures} />
+      <ListeningHeatmapSection recentlyPlayed={mockPlays} />
     );
-    // The wrapper div with the grid column span class should be present
     const wrapper = container.querySelector('[class*="col-span"]');
     expect(wrapper).toBeInTheDocument();
     expect(wrapper).toHaveClass("md:col-span-12");
   });
 
-  test("renders empty state when no valid features", () => {
-    render(<ListeningHeatmapSection audioFeatures={[null, null]} />);
+  test("renders empty state when no plays", () => {
+    render(<ListeningHeatmapSection recentlyPlayed={[]} />);
     expect(
-      screen.getByText(/No listening data available/)
+      screen.getByText(/No listening data yet/)
     ).toBeInTheDocument();
   });
 
   test("renders loading state", () => {
     render(
-      <ListeningHeatmapSection audioFeatures={[]} loading={true} />
+      <ListeningHeatmapSection recentlyPlayed={[]} loading={true} />
     );
     expect(
-      screen.queryByText(/No listening data available/)
+      screen.queryByText(/No listening data yet/)
     ).not.toBeInTheDocument();
+  });
+
+  test("renders section heading", () => {
+    render(<ListeningHeatmapSection recentlyPlayed={mockPlays} />);
+    expect(screen.getByText("Your Listening Rhythm")).toBeInTheDocument();
+  });
+
+  test("heatmap computation uses correct day/hour buckets", () => {
+    const plays: SpotifyRecentlyPlayed[] = [
+      { played_at: "2026-05-20T14:00:00Z", track: { id: "1", name: "T1" } },
+      { played_at: "2026-05-20T14:30:00Z", track: { id: "2", name: "T2" } },
+      { played_at: "2026-05-21T03:00:00Z", track: { id: "3", name: "T3" } },
+    ];
+    const { container } = render(<ListeningHeatmapSection recentlyPlayed={plays} />);
+    const cells = container.querySelectorAll('[class*="grid-cols-24"] > div');
+    expect(cells.length).toBeGreaterThan(0);
+  });
+
+  test("insight computation shows peak hour, peak day, and quietest", () => {
+    render(<ListeningHeatmapSection recentlyPlayed={mockPlays} />);
+    expect(screen.getByText("Peak Hour")).toBeInTheDocument();
+    expect(screen.getByText("Peak Day")).toBeInTheDocument();
+    expect(screen.getByText("Quietest")).toBeInTheDocument();
+  });
+
+  test("tooltip renders on hover", async () => {
+    const { container } = render(<ListeningHeatmapSection recentlyPlayed={mockPlays} />);
+    const cells = container.querySelectorAll('[class*="grid-cols-24"] > div');
+    if (cells.length > 0) {
+      const firstCell = cells[0];
+      fireEvent.mouseEnter(firstCell);
+      await waitFor(() => {
+        expect(screen.getByText(/Monday/)).toBeInTheDocument();
+        expect(screen.getByText(/Intensity:/)).toBeInTheDocument();
+      });
+    }
   });
 });

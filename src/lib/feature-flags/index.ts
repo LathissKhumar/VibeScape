@@ -19,7 +19,7 @@ export const featureFlags = {
     }
 
     // local fallback
-    if (key in localStore) return localStore[key];
+    if (key in localStore) return localStore[key]!;
     return defaultValue;
   },
 
@@ -57,7 +57,7 @@ export const featureFlags = {
         }
         // merge localStore entries not present
         for (const k of Object.keys(localStore)) {
-          if (!(k in result)) result[k] = localStore[k];
+          if (!(k in result)) result[k] = localStore[k]!;
         }
         return result;
       }

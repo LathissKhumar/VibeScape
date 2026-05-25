@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen } from "@/test/test-utils";
 import GalaxyPreviewSection from "../GalaxyPreviewSection";
 
 describe("GalaxyPreviewSection", () => {
@@ -26,9 +26,9 @@ describe("GalaxyPreviewSection", () => {
     expect(screen.getByText("1.2B Connections")).toBeInTheDocument();
   });
 
-  test("renders Explore Galaxy link", () => {
+  test("renders Explore Your Universe link", () => {
     render(<GalaxyPreviewSection />);
-    expect(screen.getAllByText("Explore Galaxy").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText("Explore Your Universe")).toBeInTheDocument();
   });
 
   test("renders Interactive 3D Galaxy placeholder", () => {

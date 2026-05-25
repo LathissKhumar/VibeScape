@@ -1,22 +1,23 @@
-// Minimal, build-safe Sentry initialization for Next.js
-// This follows the repo convention: optional initialization when env var is present
+// Minimal, build-safe Sentry wrapper for Next.js
+// @sentry/nextjs handles initialization via instrumentation.ts (server) and
+// sentry.client.config.ts (client). This module provides a typed export for
+// consuming Sentry's API without redundant init.
 
-type SentryClient = unknown | null;
+import { dynamicRequire } from "./dynamicImport";
 
-export function initSentry(): SentryClient {
+interface SentryModule {
+  init: (opts: { dsn: string; tracesSampleRate: number }) => void;
+}
+
+type SentryClient = SentryModule | null;
+
+/** Fallback init in case @sentry/nextjs is not configured. */
+function initSentryFallback(): SentryClient {
   const dsn = process.env.SENTRY_DSN;
   if (!dsn) return null;
 
-  // Dynamically require Sentry SDK at runtime to avoid build-time dependency issues
-  let Sentry: any = null;
-  try {
-    // hide static require from bundlers by using eval
-    // eslint-disable-next-line no-eval
-    const req: any = eval("require");
-    Sentry = req("@sentry/node");
-  } catch (e) {
-    return null;
-  }
+  const Sentry = dynamicRequire<SentryModule>("@sentry/node");
+  if (!Sentry) return null;
   Sentry.init({
     dsn,
     tracesSampleRate: Number(process.env.SENTRY_TRACES_SAMPLE_RATE ?? 0.0),
@@ -24,4 +25,10 @@ export function initSentry(): SentryClient {
   return Sentry;
 }
 
-export const Sentry = initSentry();
+// Prefer the already-initialized @sentry/nextjs module (set up by
+// instrumentation.ts / sentry.client.config.ts). Fall back to manual init via
+// @sentry/node only if @sentry/nextjs is unavailable.
+const sentryInstance =
+  dynamicRequire<SentryModule>("@sentry/nextjs") || initSentryFallback();
+
+export const Sentry = sentryInstance;

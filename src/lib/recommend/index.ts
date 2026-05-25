@@ -1,4 +1,4 @@
-import { computeProfileEmbedding } from "../embeddings";
+import { computeProfileEmbedding } from "../embeddings-core";
 
 export interface VibeProfile {
   genres: string[];
@@ -37,9 +37,9 @@ export function cosineSimilarity(a: number[], b: number[]): number {
   let magB = 0;
 
   for (let i = 0; i < a.length; i++) {
-    dot += a[i] * b[i];
-    magA += a[i] * a[i];
-    magB += b[i] * b[i];
+    dot += a[i]! * b[i]!;
+    magA += a[i]! * a[i]!;
+    magB += b[i]! * b[i]!;
   }
 
   const denom = Math.sqrt(magA) * Math.sqrt(magB);
@@ -160,7 +160,7 @@ export function getPersonalizedRecommendations(
     recommendations.push({
       type: "mood",
       label: "Explore New Sounds",
-      reason: "Connect your Spotify to unlock personalized recommendations",
+      reason: "Connect your music account to unlock personalized recommendations",
       confidence: 0.3,
     });
   }
@@ -175,12 +175,13 @@ function generateGenrePairs(genres: string[]): [string, string][] {
   const pairs: [string, string][] = [];
   for (let i = 0; i < genres.length - 1; i++) {
     for (let j = i + 1; j < genres.length; j++) {
-      pairs.push([genres[i], genres[j]]);
+      pairs.push([genres[i]!, genres[j]!]);
     }
   }
   if (pairs.length === 0 && genres.length === 1) {
-    const adjacent = genreAdjacency[genres[0]?.toLowerCase()];
-    if (adjacent) pairs.push([genres[0], adjacent]);
+    const genre = genres[0]!;
+    const adjacent = genreAdjacency[genre.toLowerCase()];
+    if (adjacent) pairs.push([genre, adjacent]);
   }
   return pairs;
 }

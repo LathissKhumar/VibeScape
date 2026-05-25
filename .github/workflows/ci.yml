@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  ci:
+    name: Lint, Test & Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v2
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "pnpm"
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: npx next lint
+        name: Lint
+
+      - run: pnpm test
+        name: Test
+
+      - run: pnpm build
+        name: Build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: "http://localhost:8000"
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: "test-anon-key"
+          SUPABASE_DB_URL: "postgresql://localhost:5432/test"
+          SUPABASE_SERVICE_ROLE_KEY: "test-service-role"
+          NEXTAUTH_SECRET: "test-secret"
+          NEXTAUTH_URL: "http://localhost:3000"
+          GEMINI_API_KEY: "test-gemini-key"
+          LASTFM_API_KEY: "test-lastfm-key"
+          SENTRY_DSN: ""

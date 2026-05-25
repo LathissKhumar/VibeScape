@@ -7,16 +7,17 @@ vi.mock("next-auth/react", () => ({
 }));
 
 describe("DashboardNav", () => {
-  test("renders VibeDNA branding", () => {
+  test("renders Resona branding", () => {
     render(<DashboardNav />);
-    expect(screen.getByText("VibeDNA")).toBeInTheDocument();
+    expect(screen.getByText("Resona")).toBeInTheDocument();
   });
 
   test("renders navigation links", () => {
     render(<DashboardNav />);
     expect(screen.getByText("Archetypes")).toBeInTheDocument();
-    expect(screen.getByText("Galaxy")).toBeInTheDocument();
-    expect(screen.getByText("Science")).toBeInTheDocument();
+    expect(screen.getByText("Patterns")).toBeInTheDocument();
+    expect(screen.getByText("Sonic DNA")).toBeInTheDocument();
+    expect(screen.getByText("Universe")).toBeInTheDocument();
   });
 
   test("renders Sign Out button", () => {

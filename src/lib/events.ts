@@ -6,7 +6,7 @@ export type EventMap = {
   user_created: { userId: string; email?: string };
   track_added: { trackId: string; userId?: string; source?: string };
   snapshot_created: { snapshotId: string; entityType: string; entityId: string };
-  generic: { [key: string]: any };
+  generic: { [key: string]: unknown };
 };
 
 export type EventName = keyof EventMap;
@@ -45,7 +45,7 @@ export async function emitEvent<E extends EventName>(event: E, payload: EventPay
   // Persist event to events table when DB is available. Use rawDb to avoid tight Drizzle coupling.
   try {
     if (!db) return;
-    type RawDb = { execute?: (sql: string, params?: unknown[]) => Promise<any> };
+    type RawDb = { execute?: (sql: string, params?: unknown[]) => Promise<unknown> };
     const rawDb = db as unknown as RawDb;
     const now = new Date().toISOString();
     const payloadJson = JSON.stringify(payload || {});

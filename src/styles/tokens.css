@@ -1,0 +1,88 @@
+/**
+ * Resona Design Tokens — Canonical Mapping
+
+ * This file documents the relationship between Resona custom tokens (@theme inline)
+ * and shadcn/Radix CSS variables (:root / .dark blocks in globals.css).
+ *
+ * DO NOT import this file. It is documentation only.
+ * All active tokens live in src/app/globals.css.
+ */
+
+/* ─── Color Palette ─── */
+
+/* Neon (Resona-specific, used for accents and CTAs) */
+/* --color-neon-purple: #A855F7  →  Used in gradients, glows, badges */
+/* --color-neon-cyan:    #22D3EE  →  Used in text gradients, data viz */
+/* --color-neon-pink:    #F472B6  →  Used in gradients, accents */
+
+/* Surface (Material Design 3 dark theme) */
+/* --color-bg-deep:              #050505  →  Page background */
+/* --color-bg-surface:           #121212  →  Card/panel backgrounds */
+/* --color-background / --color-surface:  #16111b  →  shadcn background */
+/* --color-surface-container-lowest:      #110c15  →  Lowest elevation */
+/* --color-surface-container-low:         #1f1a23  →  Low elevation */
+/* --color-surface-container:             #231e27  →  Default elevation */
+/* --color-surface-container-high:        #2e2832  →  High elevation */
+/* --color-surface-container-highest:     #39323d  →  Highest elevation */
+
+/* Text */
+/* --color-on-surface:           #eadfed  →  Primary text on surfaces */
+/* --color-on-surface-variant:   #cfc2d6  →  Secondary text */
+/* --color-outline:              #988d9f  →  Muted text, icons */
+/* --color-outline-variant:      #4d4354  →  Disabled text */
+
+/* Primary (Purple) */
+/* --color-primary:              #ddb7ff  →  Primary actions */
+/* --color-primary-container:    #b76dff  →  Primary container bg */
+/* --color-on-primary:           #490080  →  Text on primary */
+
+/* Secondary (Cyan) */
+/* --color-secondary:            #5de6ff  →  Secondary actions */
+/* --color-secondary-container:  #00cbe6  →  Secondary container bg */
+
+/* Tertiary (Pink) */
+/* --color-tertiary:             #ffafd3  →  Tertiary accents */
+/* --color-tertiary-container:   #e364a7  →  Tertiary container bg */
+
+/* Error */
+/* --color-error:                #ffb4ab  →  Error text */
+/* --color-error-container:      #93000a  →  Error background */
+
+/* ─── shadcn ↔ Resona Mapping ─── */
+
+/* shadcn variable        → Resona token          → Purpose */
+/* --background           → --color-background     → Page background */
+/* --foreground           → --color-foreground     → Primary text */
+/* --card                 → --color-card           → Card background */
+/* --card-foreground      → --color-card-foreground→ Card text */
+/* --popover              → --color-popover        → Popover background */
+/* --popover-foreground   → --color-popover-foreground → Popover text */
+/* --primary              → --color-primary        → Primary action color */
+/* --primary-foreground   → --color-primary-foreground → Text on primary */
+/* --secondary            → --color-secondary      → Secondary action */
+/* --secondary-foreground → --color-secondary-foreground → Text on secondary */
+/* --muted                → --color-muted          → Muted background */
+/* --muted-foreground     → --color-muted-foreground → Muted text */
+/* --accent               → --color-accent         → Accent background */
+/* --accent-foreground    → --color-accent-foreground → Text on accent */
+/* --destructive          → --color-destructive    → Error/destructive */
+/* --border               → --color-border         → Border color */
+/* --input                → --color-input          → Input border */
+/* --ring                 → --color-ring           → Focus ring */
+
+/* ─── Spacing Tokens ─── */
+/* --spacing-section-gap:    80px   → Vertical gap between landing sections */
+/* --spacing-margin-desktop: 64px   → Desktop page margin */
+/* --spacing-margin-mobile:  20px   → Mobile page margin */
+/* --spacing-gutter:         24px   → Content gutter */
+/* --spacing-element-gap:    16px   → Gap between inline elements */
+/* --spacing-container-max:  1440px → Max content width */
+
+/* ─── Radius Tokens ─── */
+/* --radius-sm:   calc(var(--radius) * 0.6)  → Small radius (badges, inputs) */
+/* --radius-md:   calc(var(--radius) * 0.8)  → Medium radius (cards) */
+/* --radius-lg:   var(--radius)              → Large radius (panels) */
+/* --radius-xl:   calc(var(--radius) * 1.4)  → Extra large radius */
+/* --radius-2xl:  calc(var(--radius) * 1.8)  → 2XL radius */
+/* --radius-3xl:  calc(var(--radius) * 2.2)  → 3XL radius */
+/* --radius-4xl:  calc(var(--radius) * 2.6)  → 4XL radius */

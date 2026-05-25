@@ -1,16 +1,49 @@
-Cache layer (hot/warm/cold)
+## Cache layer
 
-Overview
-- hot: Redis via src/lib/cache/redis.ts — low-latency, ephemeral cache
-- warm: Postgres table `spotify_cache` — durable, used as fallback when hot misses occur
-- cold: Placeholder for long-term archival (S3) — not implemented yet
+### Architecture (single-tier)
 
-Usage
-- Import src/lib/cache/index.ts and use coreCache.get/set/del(key, value)
+| Tier | Backend | Status |
+|------|---------|--------|
+| **Primary** | Supabase Postgres (`spotify_cache` table) | ✅ Active |
+| **Fallback** | Redis (Upstash) via `redis.ts` | ✅ Optional — graceful degradation when env vars are set |
+| **Cold** | Placeholder for long-term archival (S3, Glacier) | ❌ Not implemented |
 
-Env
-- UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN (or REDIS_REST_URL/REDIS_REST_TOKEN)
-- DATABASE_URL (optional — enables warm-tier persistence)
+The cache uses a **Supabase-first** strategy:
+1. `get` queries `spotify_cache` on Supabase Postgres; if the row is expired or absent, it falls back to Redis.
+2. `set` upserts into `spotify_cache` and opportunistically writes to Redis for backward compatibility.
+3. `del` removes from `spotify_cache` and Redis.
 
-Notes
-- Warm tier currently uses a minimal raw SQL path against `spotify_cache` table to avoid requiring Drizzle at build time. Replace with Drizzle queries when drizzle-orm is installed and configured.
+Redis operations are purely opportunistic — if Redis env vars (`UPSTASH_REDIS_REST_URL` / `REDIS_REST_URL`) are not set, all Redis calls are silently skipped. If Supabase is not configured, operations degrade gracefully (returning `null` for `get`, `false` for `set`/`del`).
+
+### Usage
+
+```ts
+import coreCache from '@/lib/cache';
+
+await coreCache.get('key');
+await coreCache.set('key', value, { ex: 3600 }); // 1-hour TTL
+await coreCache.del('key');
+```
+
+### Environment variables
+
+| Variable | Required | Purpose |
+|----------|----------|---------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Yes (for primary cache) | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Yes (for primary cache) | Supabase anon key |
+| `UPSTASH_REDIS_REST_URL` / `REDIS_REST_URL` | No | Redis fallback — omit to disable |
+| `UPSTASH_REDIS_REST_TOKEN` / `REDIS_REST_TOKEN` | No | Redis fallback token |
+
+### Table schema (`spotify_cache`)
+
+```sql
+CREATE TABLE spotify_cache (
+  id text PRIMARY KEY,
+  user_id uuid REFERENCES users(id) ON DELETE SET NULL,
+  data jsonb NOT NULL,
+  expires_at timestamptz,
+  updated_at timestamptz DEFAULT now() NOT NULL
+);
+```
+
+Expired rows are filtered client-side: `get` checks `expires_at` and treats expired rows as cache misses. A periodic cleanup job can be scheduled via `pg_cron` or a cron-based Edge Function.

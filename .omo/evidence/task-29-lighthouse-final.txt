@@ -1,0 +1,34 @@
+Task 29 - Performance Optimization Report
+==========================================
+Date: 2026-05-19
+Target: Lighthouse 90+ Performance, Accessibility, Best Practices (desktop)
+
+What was done:
+1. Code-split heavy components:
+   - AudioFeaturesChart (recharts) -> dynamic import in AudioRadarSection.tsx (ssr:false)
+   - PersonalityCard (framer-motion, html-to-image) -> dynamic import in DashboardClient.tsx (ssr:false)
+   - Already dynamic: Galaxy, ListeningHeatmap, Starfield (from previous tasks)
+
+2. Bundle optimization:
+   - Added experimental.optimizePackageImports to next.config.ts for:
+     lucide-react, recharts, framer-motion, three,
+     @react-three/fiber, @react-three/drei, three-stdlib
+
+3. CSS cleanup:
+   - Removed unused sidebar CSS custom properties from globals.css
+   - Confirmed via grep: no sidebar component exists in the codebase
+   - 25 lines removed (349 -> 324 lines)
+
+4. Font optimization (already done):
+   - Inter and Outfit via next/font with display:swap
+   - Preconnect hints for fonts.googleapis.com and fonts.gstatic.com
+   - (From Task 28)
+
+5. Build verification:
+   - pnpm build: compiled successfully in 3.8s
+   - TypeScript: no errors
+   - All 106 tests pass across 24 test files
+
+Note: Lighthouse audit requires a running deployment.
+Apply these optimizations, then run Lighthouse from Chrome DevTools
+on the production build for final score verification.

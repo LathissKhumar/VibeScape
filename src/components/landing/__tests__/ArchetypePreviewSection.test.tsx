@@ -1,16 +1,11 @@
-import { render, screen } from "@testing-library/react";
-import { vi } from "vitest";
+import { render, screen } from "@/test/test-utils";
 import ArchetypePreviewSection from "../ArchetypePreviewSection";
-
-vi.mock("@/hooks/useReducedMotion", () => ({
-  default: () => false,
-}));
 
 describe("ArchetypePreviewSection", () => {
   test("renders section heading", () => {
     render(<ArchetypePreviewSection />);
     expect(
-      screen.getByText("Music Personality Archetypes")
+      screen.getByText("Discover Your Audio Archetype")
     ).toBeInTheDocument();
   });
 

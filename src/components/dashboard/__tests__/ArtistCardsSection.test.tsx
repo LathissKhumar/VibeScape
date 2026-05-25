@@ -1,11 +1,6 @@
-import { render, screen } from "@testing-library/react";
-import { vi } from "vitest";
+import { render, screen } from "@/test/test-utils";
 import ArtistCardsSection from "../ArtistCardsSection";
 import type { SpotifyArtist } from "@/lib/spotify";
-
-vi.mock("@/hooks/useReducedMotion", () => ({
-  default: () => false,
-}));
 
 const mockArtists: SpotifyArtist[] = [
   { id: "1", name: "Radiohead", genres: ["alternative", "rock"], popularity: 85 },
@@ -18,7 +13,7 @@ describe("ArtistCardsSection", () => {
     render(
       <ArtistCardsSection topArtists={mockArtists} listeningAura="#A855F7" />
     );
-    expect(screen.getByText("Sonic Influences")).toBeInTheDocument();
+    expect(screen.getByText("Your Top Artists")).toBeInTheDocument();
   });
 
   test("renders all three artist cards", () => {
@@ -34,9 +29,9 @@ describe("ArtistCardsSection", () => {
     render(
       <ArtistCardsSection topArtists={mockArtists} listeningAura="#A855F7" />
     );
-    expect(screen.getByText("Top Artist")).toBeInTheDocument();
-    expect(screen.getByText("Rising Influence")).toBeInTheDocument();
-    expect(screen.getByText("The Classic")).toBeInTheDocument();
+    expect(screen.getByText("Most Played")).toBeInTheDocument();
+    expect(screen.getByText("Rising Star")).toBeInTheDocument();
+    expect(screen.getByText("Timeless Favorite")).toBeInTheDocument();
   });
 
   test("renders genre badges", () => {
@@ -51,13 +46,13 @@ describe("ArtistCardsSection", () => {
     render(
       <ArtistCardsSection topArtists={[]} listeningAura="#A855F7" />
     );
-    expect(screen.getByText("No artists found")).toBeInTheDocument();
+    expect(screen.getByText(/Keep listening to discover your top artists/i)).toBeInTheDocument();
   });
 
   test("renders loading skeleton when loading", () => {
     render(
       <ArtistCardsSection topArtists={[]} listeningAura="#A855F7" loading={true} />
     );
-    expect(screen.queryByText("Sonic Influences")).not.toBeInTheDocument();
+    expect(screen.queryByText("Your Top Artists")).not.toBeInTheDocument();
   });
 });

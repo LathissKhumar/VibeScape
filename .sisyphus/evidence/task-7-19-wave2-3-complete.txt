@@ -1,0 +1,1 @@
+Wave 2+3 complete: Landing page (Tasks 7-12) and Dashboard (Tasks 13-19) redesigned. All components use framer-motion with useReducedMotion checks. Build passes. 109/109 tests pass.

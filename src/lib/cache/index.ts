@@ -1,110 +1,118 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { cache as redisCache } from "./redis";
-import { db } from "../db";
-// When Drizzle is available, import table helpers. Use try/catch to allow build-time safety.
-let spotify_cache_table: any = null;
-try {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const { pgTable, text, jsonb, timestamp } = require("drizzle-orm/pg-core");
-  // Define minimal table shape for use by Drizzle queries if needed elsewhere.
-  spotify_cache_table = pgTable("spotify_cache", {
-    id: text("id").primaryKey(),
-    user_id: text("user_id"),
-    data: jsonb("data"),
-    updated_at: timestamp("updated_at").defaultNow(),
-  });
-} catch (e) {
-  // Drizzle not available at build time — keep null
-}
-
-// Multi-tier cache abstraction: hot (Redis), warm (Postgres), cold (placeholder)
 
 export type CacheValue<T> = T | null;
 
+function isRedisConfigured(): boolean {
+  return !!(process.env.UPSTASH_REDIS_REST_URL || process.env.REDIS_REST_URL);
+}
+
+let _supabase: SupabaseClient | null | undefined = undefined;
+
+async function getSupabase(): Promise<SupabaseClient | null | undefined> {
+  if (_supabase !== undefined) return _supabase;
+  try {
+    const { supabase } = await import("@/lib/supabase");
+    _supabase = supabase;
+  } catch {
+    _supabase = null;
+  }
+  return _supabase;
+}
+
 export const coreCache = {
-  // Try hot cache first (Redis). If miss, fall back to warm (Postgres) if available.
   async get<T = unknown>(key: string): Promise<CacheValue<T>> {
-    // Hot
-    try {
-      const hot = await redisCache.get<T>(key);
-      if (hot !== null) return hot;
-    } catch (e) {
-      // swallow — will try warm
-    }
+    const sb = await getSupabase();
+    if (sb) {
+      try {
+        const { data, error } = await sb
+          .from("spotify_cache")
+          .select("data, expires_at")
+          .eq("id", key)
+          .single();
 
-    // Warm: use Postgres table `spotify_cache` as a generic key-value store when available.
-    try {
-      if (!db) return null;
-      const rawDb: any = db;
-
-      // If Drizzle is available and table is defined, use it for typed queries.
-      if (spotify_cache_table && rawDb.select) {
-        const row = await rawDb.select().from(spotify_cache_table).where(spotify_cache_table.id.eq(key)).limit(1).execute?.();
-        // Drizzle may return array or object depending on adapter
-        if (Array.isArray(row) && row[0]) return row[0].data as T;
-        if (row && row.data) return row.data as T;
+        if (!error && data) {
+          if (data.expires_at === null || new Date(data.expires_at) > new Date()) {
+            return data.data as T;
+          }
+        }
+      } catch {
+        // fall through
       }
-
-      // Fallback: raw SQL for environments without Drizzle or when table not defined
-      const res = await rawDb.execute?.("SELECT data FROM spotify_cache WHERE id = $1 LIMIT 1", [key]);
-      if (res && res.rows && res.rows[0]) return res.rows[0].data as T;
-    } catch (e) {
-      // noop
     }
 
-    // Cold: not implemented yet — return null
+    if (isRedisConfigured()) {
+      try {
+        const hit = await redisCache.get<T>(key);
+        if (hit !== null) return hit;
+      } catch {
+        // fall through
+      }
+    }
+
     return null;
   },
 
   async set<T = unknown>(key: string, value: T, opts?: { ex?: number }): Promise<boolean> {
-    // Set hot cache first
-    try {
-      await redisCache.set<T>(key, value, { ex: opts?.ex });
-    } catch (e) {
-      // ignore
-    }
+    let supabaseOk = false;
 
-    // Also persist to warm cache (Postgres) when available
-    try {
-      if (!db) return true;
+    const sb = await getSupabase();
+    if (sb) {
+      try {
+        const expiresAt = opts?.ex ? new Date(Date.now() + opts.ex * 1000).toISOString() : null;
 
-      const rawDb: any = db;
-      if (spotify_cache_table && rawDb.insert) {
-        await rawDb.insert(spotify_cache_table).values({ id: key, user_id: null, data: value }).onConflictDoUpdate({ target: spotify_cache_table.id, set: { data: value } }).execute?.();
-        return true;
+        const { error } = await sb.from("spotify_cache").upsert(
+          {
+            id: key,
+            user_id: null,
+            data: value,
+            expires_at: expiresAt,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: "id" },
+        );
+
+        if (!error) supabaseOk = true;
+      } catch {
+        // fall through
       }
-
-      // Fallback raw SQL
-      await rawDb.execute?.("INSERT INTO spotify_cache (id, user_id, data, updated_at) VALUES ($1, $2, $3, now()) ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = now()", [key, null, value]);
-    } catch (e) {
-      // ignore
     }
 
-    return true;
+    if (isRedisConfigured()) {
+      try {
+        await redisCache.set(key, value, { ex: opts?.ex });
+        return true;
+      } catch {
+        // fall through
+      }
+    }
+
+    return supabaseOk;
   },
 
   async del(key: string): Promise<boolean> {
-    try {
-      await redisCache.del(key);
-    } catch (e) {
-      // ignore
-    }
+    let supabaseOk = false;
 
-    try {
-      if (!db) return true;
-
-      const rawDb: any = db;
-      if (spotify_cache_table && rawDb.delete) {
-        await rawDb.delete(spotify_cache_table).where(spotify_cache_table.id.eq(key)).execute?.();
-        return true;
+    const sb = await getSupabase();
+    if (sb) {
+      try {
+        const { error } = await sb.from("spotify_cache").delete().eq("id", key);
+        if (!error) supabaseOk = true;
+      } catch {
+        // fall through
       }
-
-      // Fallback raw SQL
-      await rawDb.execute?.("DELETE FROM spotify_cache WHERE id = $1", [key]);
-    } catch (e) {
-      // ignore
     }
 
-    return true;
+    if (isRedisConfigured()) {
+      try {
+        await redisCache.del(key);
+        return true;
+      } catch {
+        // fall through
+      }
+    }
+
+    return supabaseOk;
   },
 };
 

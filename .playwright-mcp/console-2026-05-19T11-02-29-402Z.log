@@ -1,0 +1,13 @@
+[      36ms] [ERROR] Refused to apply style from 'http://localhost:3000/_next/static/chunks/04otpsaqtjowi.css' because its MIME type ('text/plain') is not a supported stylesheet MIME type, and strict MIME checking is enabled. @ http://localhost:3000/:0
+[      57ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/_next/static/chunks/0zv4qebtaff_h.js:0
+[      57ms] [ERROR] Refused to execute script from 'http://localhost:3000/_next/static/chunks/0zv4qebtaff_h.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled. @ http://localhost:3000/:0
+[      58ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/_next/static/chunks/0mmu._ogbl0rl.js:0
+[      58ms] [ERROR] Refused to execute script from 'http://localhost:3000/_next/static/chunks/0mmu._ogbl0rl.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled. @ http://localhost:3000/:0
+[      58ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/_next/static/chunks/0d9~9d_eq8i79.js:0
+[      58ms] [ERROR] Refused to execute script from 'http://localhost:3000/_next/static/chunks/0d9~9d_eq8i79.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled. @ http://localhost:3000/:0
+[      58ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/_next/static/chunks/0a8re1x69og4_.js:0
+[      58ms] [ERROR] Refused to execute script from 'http://localhost:3000/_next/static/chunks/0a8re1x69og4_.js' because its MIME type ('text/plain') is not executable, and strict MIME type checking is enabled. @ http://localhost:3000/:0
+[      64ms] ChunkLoadError: Failed to load chunk /_next/static/chunks/0mmu._ogbl0rl.js from module 36010
+    at http://localhost:3000/_next/static/chunks/turbopack-16bnvaggz8.n7.js:1:6095
+[    3064ms] [WARNING] The resource http://localhost:3000/_next/static/media/1b99372b3eaef0c8-s.p.0gx2haw2tmll8.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[    3064ms] [WARNING] The resource http://localhost:3000/_next/static/media/83afe278b6a6bb3c-s.p.0q-301v4kxxnr.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0

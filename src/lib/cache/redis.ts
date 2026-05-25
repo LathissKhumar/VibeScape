@@ -33,8 +33,6 @@ export const cache = {
       // Upstash returns null if not found; when present it returns string or parsed JSON
       return res as T | null;
     } catch (err) {
-      // Graceful degradation: log and return null
-      // eslint-disable-next-line no-console
       console.warn("Redis GET failed:", err);
       return null;
     }
@@ -45,13 +43,12 @@ export const cache = {
     if (!c) return false;
     try {
       if (opts?.ex) {
-        await c.set(key, value as any, { ex: opts.ex });
+        await c.set(key, value, { ex: opts.ex });
       } else {
-        await c.set(key, value as any);
+        await c.set(key, value);
       }
       return true;
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.warn("Redis SET failed:", err);
       return false;
     }
@@ -64,7 +61,6 @@ export const cache = {
       await c.del(key);
       return true;
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.warn("Redis DEL failed:", err);
       return false;
     }
@@ -78,7 +74,6 @@ export const cache = {
       const res = await c.get(key);
       return res !== null && typeof res !== "undefined";
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.warn("Redis EXISTS failed:", err);
       return false;
     }
@@ -88,13 +83,11 @@ export const cache = {
     const c = initClient();
     if (!c) return [];
     try {
-      // Upstash supports the KEYS command via `keys` method
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const res: string[] = await c.keys(pattern);
+      const keysMethod = (c as unknown as Record<string, unknown>).keys as ((pattern: string) => Promise<string[]>) | undefined;
+      if (!keysMethod) return [];
+      const res = await keysMethod(pattern);
       return res || [];
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.warn("Redis KEYS failed:", err);
       return [];
     }

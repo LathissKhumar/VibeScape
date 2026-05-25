@@ -3,7 +3,7 @@ import { vi } from "vitest";
 import DashboardErrorBoundary from "../DashboardErrorBoundary";
 
 vi.mock("@/components/ui/ErrorState", () => ({
-  default: ({ title, message, onRetry }: any) => (
+  default: ({ title, message, onRetry }: { title: string; message: string; onRetry?: () => void }) => (
     <div data-testid="error-state">
       <div data-testid="error-title">{title}</div>
       <div data-testid="error-message">{message}</div>

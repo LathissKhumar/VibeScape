@@ -2,7 +2,7 @@
 // Export a plain config object so TypeScript/Next won't try to resolve Vitest at build time.
 import path from 'path';
 
-const config: any = {
+const config = {
   test: {
     environment: 'jsdom',
     globals: true,

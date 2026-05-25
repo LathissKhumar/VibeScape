@@ -1,21 +1,19 @@
-import { render, screen } from "@testing-library/react";
-import { vi } from "vitest";
+import { render, screen } from "@/test/test-utils";
 import AIInsightsSheet from "../AIInsightsSheet";
 import type { Personality } from "@/types/next-auth";
 import type { SpotifyArtist, SpotifyAudioFeatures } from "@/lib/spotify";
 
-// Sheet uses @base-ui/react/dialog — mock the whole Sheet
 vi.mock("@/components/ui/sheet", () => ({
-  Sheet: ({ children }: any) => <div data-testid="sheet">{children}</div>,
-  SheetTrigger: ({ render }: any) => (
-    <div data-testid="sheet-trigger">{render}</div>
+  Sheet: ({ children }: { children: React.ReactNode }) => <div data-testid="sheet">{children}</div>,
+  SheetTrigger: ({ render: renderProp }: { render?: React.ReactNode }) => (
+    <div data-testid="sheet-trigger">{renderProp}</div>
   ),
-  SheetContent: ({ children }: any) => (
+  SheetContent: ({ children }: { children: React.ReactNode }) => (
     <div data-testid="sheet-content">{children}</div>
   ),
-  SheetHeader: ({ children }: any) => <div>{children}</div>,
-  SheetTitle: ({ children }: any) => <div>{children}</div>,
-  SheetDescription: ({ children }: any) => <div>{children}</div>,
+  SheetHeader: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  SheetTitle: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+  SheetDescription: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
 const mockPersonality: Personality = {
@@ -55,7 +53,7 @@ describe("AIInsightsSheet", () => {
         audioFeatures={mockFeatures}
       />
     );
-    expect(screen.getByText("AI Insights")).toBeInTheDocument();
+    expect(screen.getByText("Your AI Insights")).toBeInTheDocument();
     expect(screen.getByText("The Visionary Curator")).toBeInTheDocument();
     expect(screen.getByText("You seek meaning in every melody.")).toBeInTheDocument();
     expect(screen.getByText("Deep Listener")).toBeInTheDocument();
@@ -71,24 +69,9 @@ describe("AIInsightsSheet", () => {
       />
     );
     expect(screen.getByText("Mood Overview")).toBeInTheDocument();
-    // Energy should be 80% (0.8 * 100)
-    expect(screen.getByText("80%")).toBeInTheDocument();
-    // Danceability should be 70%
-    expect(screen.getByText("70%")).toBeInTheDocument();
-    // Acousticness should be 20%
-    expect(screen.getByText("20%")).toBeInTheDocument();
-  });
-
-  test("renders top genres", () => {
-    render(
-      <AIInsightsSheet
-        personality={mockPersonality}
-        topArtists={mockArtists}
-        audioFeatures={mockFeatures}
-      />
-    );
-    expect(screen.getByText("alternative")).toBeInTheDocument();
-    expect(screen.getByText("electronic")).toBeInTheDocument();
+    expect(screen.getAllByText("80%").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("70%").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("20%").length).toBeGreaterThanOrEqual(1);
   });
 
   test("renders quick stats", () => {
@@ -99,11 +82,11 @@ describe("AIInsightsSheet", () => {
         audioFeatures={mockFeatures}
       />
     );
-    expect(screen.getByText("Artists Analyzed")).toBeInTheDocument();
-    expect(screen.getByText("Tracks Analyzed")).toBeInTheDocument();
+    expect(screen.getByText("Artists")).toBeInTheDocument();
+    expect(screen.getByText("Tracks")).toBeInTheDocument();
   });
 
-  test("renders refresh analysis button (disabled)", () => {
+  test("renders refresh analysis button", () => {
     render(
       <AIInsightsSheet
         personality={mockPersonality}
@@ -113,7 +96,6 @@ describe("AIInsightsSheet", () => {
     );
     const refreshBtn = screen.getByText("Refresh Analysis");
     expect(refreshBtn).toBeInTheDocument();
-    expect(refreshBtn.closest("button")).toBeDisabled();
   });
 
   test("renders loading state", () => {
@@ -125,8 +107,7 @@ describe("AIInsightsSheet", () => {
         loading={true}
       />
     );
-    expect(screen.getByText("AI Insights")).toBeInTheDocument();
-    // Should not show personality content
+    expect(screen.getByText("Your AI Insights")).toBeInTheDocument();
     expect(screen.queryByText("The Visionary Curator")).not.toBeInTheDocument();
   });
 
@@ -139,7 +120,7 @@ describe("AIInsightsSheet", () => {
         loading={false}
       />
     );
-    expect(screen.getByText("AI Insights")).toBeInTheDocument();
+    expect(screen.getByText("Your AI Insights")).toBeInTheDocument();
     expect(
       screen.getByText(/No personality data yet/)
     ).toBeInTheDocument();

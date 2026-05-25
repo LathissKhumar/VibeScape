@@ -1,0 +1,125 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e4]:
+      - generic [ref=e5]:
+        - link "VibeDNA" [ref=e6] [cursor=pointer]:
+          - /url: "#"
+        - generic [ref=e7]:
+          - link "Archetypes" [ref=e8] [cursor=pointer]:
+            - /url: "#archetypes"
+            - text: Archetypes
+          - link "Galaxy" [ref=e9] [cursor=pointer]:
+            - /url: "#galaxy"
+            - text: Galaxy
+          - link "Science" [ref=e10] [cursor=pointer]:
+            - /url: "#science"
+            - text: Science
+        - button "Connect with Spotify" [ref=e11] [cursor=pointer]
+    - banner [ref=e12]:
+      - generic [ref=e13]:
+        - generic [ref=e15]: Your Music. Your Identity.
+        - heading "Make people obsessed with discovering themselves through music." [level=1] [ref=e16]:
+          - generic [ref=e17]: Make
+          - generic [ref=e18]: people
+          - generic [ref=e19]: obsessed
+          - generic [ref=e20]: with
+          - generic [ref=e21]: discovering
+          - generic [ref=e22]: themselves
+          - generic [ref=e23]: through
+          - generic [ref=e24]: music.
+        - paragraph [ref=e25]: VibeDNA decodes your listening habits into a digital fingerprint. Explore your sonic galaxy and find the archetypes that define your soul.
+        - generic [ref=e26]:
+          - button "Discover Your VibeDNA" [ref=e27] [cursor=pointer]:
+            - img [ref=e28]
+            - text: Discover Your VibeDNA
+          - link "Explore Galaxy" [ref=e29] [cursor=pointer]:
+            - /url: "#galaxy"
+            - text: Explore Galaxy
+            - img [ref=e30]
+      - img [ref=e34]
+    - generic [ref=e36]:
+      - generic [ref=e37]:
+        - generic [ref=e38]: Personal Identity
+        - heading "Discover Your Audio Archetype" [level=2] [ref=e39]
+        - paragraph [ref=e40]: Our algorithms analyze over 50 sonic vectors to place you within one of our high-fidelity archetypes.
+      - generic [ref=e41]:
+        - generic [ref=e43]:
+          - generic [ref=e44]:
+            - img [ref=e46]
+            - generic [ref=e50]: The Sonic Architect
+          - generic [ref=e51]:
+            - paragraph [ref=e52]: Precision, structure, and complex layers. You appreciate the mathematical beauty of high-production soundscapes.
+            - generic [ref=e53]:
+              - generic [ref=e54]: Techno
+              - generic [ref=e55]: Jazz
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - img [ref=e60]
+            - generic [ref=e62]: The Midnight Dreamer
+          - generic [ref=e63]:
+            - paragraph [ref=e64]: Atmospheric, ethereal, and emotive. Your soul resonates with the quiet intensity of lo-fi and cinematic scores.
+            - generic [ref=e65]:
+              - generic [ref=e66]: Ambient
+              - generic [ref=e67]: Indie
+        - generic [ref=e69]:
+          - generic [ref=e70]:
+            - img [ref=e72]
+            - generic [ref=e74]: The Rhythm Rebel
+          - generic [ref=e75]:
+            - paragraph [ref=e76]: High energy, disruptive, and pulse-driven. You lead the charge with heavy bass and unapologetic tempo.
+            - generic [ref=e77]:
+              - generic [ref=e78]: Phonk
+              - generic [ref=e79]: Drill
+    - generic [ref=e81]:
+      - generic [ref=e82]:
+        - generic [ref=e86]:
+          - img [ref=e87]
+          - paragraph [ref=e90]: Interactive 3D Galaxy
+          - paragraph [ref=e91]: Connect with Spotify to explore
+        - generic [ref=e93]:
+          - img [ref=e95]
+          - generic [ref=e101]:
+            - paragraph [ref=e102]: Neural Mapping
+            - paragraph [ref=e103]: 1.2B Connections
+      - generic [ref=e104]:
+        - generic [ref=e105]: Your Music, Visualized
+        - heading "3D Music Galaxy" [level=2] [ref=e106]
+        - paragraph [ref=e107]: Step inside your own personal universe. VibeDNA doesn't just list your songs; it visualizes the celestial geometry of your taste. Every artist is a star, every genre a nebula, forming a unique map of your identity that evolves as you listen.
+        - list [ref=e108]:
+          - listitem [ref=e109]:
+            - img [ref=e110]
+            - generic [ref=e113]:
+              - heading "Spatial Exploration" [level=4] [ref=e114]
+              - paragraph [ref=e115]: Navigate your library in a fully immersive 3D space designed for discovery.
+          - listitem [ref=e116]:
+            - img [ref=e117]
+            - generic [ref=e118]:
+              - heading "Genre Drift Analysis" [level=4] [ref=e119]
+              - paragraph [ref=e120]: Visualize how your musical orbit has shifted over months or years.
+        - link "Explore Your Universe" [ref=e121] [cursor=pointer]:
+          - /url: "#galaxy"
+    - contentinfo [ref=e122]:
+      - generic [ref=e123]:
+        - generic [ref=e124]:
+          - generic [ref=e125]: VibeDNA
+          - paragraph [ref=e126]: © 2024 VibeDNA. Decode your sonic soul.
+        - generic [ref=e127]:
+          - link "Website" [ref=e128] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e129]
+          - link "Links" [ref=e132] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e133]
+          - link "Contact" [ref=e136] [cursor=pointer]:
+            - /url: "#"
+            - img [ref=e137]
+        - generic [ref=e140]:
+          - link "Privacy" [ref=e141] [cursor=pointer]:
+            - /url: "#"
+          - link "Terms" [ref=e142] [cursor=pointer]:
+            - /url: "#"
+          - link "Support" [ref=e143] [cursor=pointer]:
+            - /url: "#"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e149] [cursor=pointer]:
+    - img [ref=e150]

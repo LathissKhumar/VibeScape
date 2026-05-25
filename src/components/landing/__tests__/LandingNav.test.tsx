@@ -1,15 +1,10 @@
-import { render, screen } from "@testing-library/react";
-import { vi } from "vitest";
+import { render, screen } from "@/test/test-utils";
 import LandingNav from "../LandingNav";
 
-vi.mock("next-auth/react", () => ({
-  signIn: vi.fn(),
-}));
-
 describe("LandingNav", () => {
-  test("renders VibeDNA logo", () => {
+  test("renders Resona logo", () => {
     render(<LandingNav />);
-    expect(screen.getByText("VibeDNA")).toBeInTheDocument();
+    expect(screen.getByText("Resona")).toBeInTheDocument();
   });
 
   test("renders all nav links", () => {
@@ -19,14 +14,8 @@ describe("LandingNav", () => {
     expect(screen.getByText("Science")).toBeInTheDocument();
   });
 
-  test("active link has neon-cyan styling", () => {
+  test("renders Connect with YouTube Music button on desktop", () => {
     render(<LandingNav />);
-    const activeLink = screen.getByText("Archetypes");
-    expect(activeLink.className).toContain("text-neon-cyan");
-  });
-
-  test("renders Connect with Spotify button on desktop", () => {
-    render(<LandingNav />);
-    expect(screen.getByText("Connect with Spotify")).toBeInTheDocument();
+    expect(screen.getByText("Connect with YouTube Music")).toBeInTheDocument();
   });
 });

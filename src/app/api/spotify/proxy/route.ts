@@ -1,36 +1,49 @@
 import { NextResponse } from 'next/server';
-import { fetchFromSpotify } from '../../../../lib/spotify';
+import { searchTrack, getTrackAudioFeatures } from '../../../../lib/lastfm';
+import { getListeningHistory, getTopArtists, getTopTracks } from '../../../../lib/ytmusic';
 import rateLimit from '../../../../lib/rateLimiter';
 import coreCache from '../../../../lib/cache';
 
-// Minimal Spotify proxy route — GET only for demonstration
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const path = url.searchParams.get('path') || '';
-  const token = request.headers.get('authorization')?.replace(/^Bearer\s*/i, '') || '';
+  const action = url.searchParams.get('action') || '';
 
-  // Simple key per token+path for rate-limiting and caching
-  const key = `spotify:proxy:${token || 'anonymous'}:${path}`;
+  const key = `ytmusic:${action}:${path}`;
 
-  // Rate limit: 60 requests per minute per token
   const rl = await rateLimit(key, 60, 60);
   if (!rl.allowed) {
     return NextResponse.json({ ok: false, error: 'rate_limited', remaining: rl.remaining }, { status: 429 });
   }
 
-  // Try cache
   const cached = await coreCache.get(key);
   if (cached) return NextResponse.json(cached, { status: 200 });
 
-  if (!token) return NextResponse.json({ ok: false, error: 'missing_token' }, { status: 401 });
-
   try {
-    const data = await fetchFromSpotify(path, token);
-    // Store in hot/warm cache with TTL of 60 seconds
+    let data;
+
+    if (action === 'history') {
+      data = await getListeningHistory(50);
+    } else if (action === 'top-artists') {
+      data = await getTopArtists(20);
+    } else if (action === 'top-tracks') {
+      data = await getTopTracks(20);
+    } else if (action === 'lastfm-search') {
+      const title = url.searchParams.get('title') || '';
+      const artist = url.searchParams.get('artist') || '';
+      data = await searchTrack(title, artist);
+    } else if (action === 'lastfm-features') {
+      const trackName = url.searchParams.get('track') || '';
+      const artistName = url.searchParams.get('artist') || '';
+      data = await getTrackAudioFeatures(trackName, artistName);
+    } else {
+      return NextResponse.json({ ok: false, error: 'unknown_action' }, { status: 400 });
+    }
+
     await coreCache.set(key, data, { ex: 60 });
     return NextResponse.json(data, { status: 200 });
-  } catch (err: any) {
-    return NextResponse.json({ ok: false, error: err?.message || 'spotify_error' }, { status: 502 });
+  } catch (err: unknown) {
+    return NextResponse.json({ ok: false, error: (err as Error)?.message || 'api_error' }, { status: 502 });
   }
 }
 

@@ -3,6 +3,17 @@ import { vi } from "vitest";
 import PersonalityHero from "../PersonalityHero";
 import type { Personality } from "@/types/next-auth";
 
+vi.mock("framer-motion", async () => {
+  const actual = await vi.importActual("framer-motion");
+  return {
+    ...actual,
+    useScroll: () => ({ scrollYProgress: { get: () => 0, on: () => () => {} } }),
+    useTransform: (_motionValue: { get: () => number }, _range: number[], output: number[]) => ({
+      get: () => output[0],
+    }),
+  };
+});
+
 vi.mock("@/hooks/useReducedMotion", () => ({
   default: () => false,
 }));
@@ -18,9 +29,7 @@ const mockPersonality: Personality = {
 describe("PersonalityHero", () => {
   test("renders archetype name with gradient", () => {
     render(<PersonalityHero personality={mockPersonality} />);
-    expect(screen.getByText("The")).toBeInTheDocument();
-    expect(screen.getByText("Visionary")).toBeInTheDocument();
-    expect(screen.getByText("Curator")).toBeInTheDocument();
+    expect(screen.getByText("The Visionary Curator")).toBeInTheDocument();
   });
 
   test("renders summary", () => {

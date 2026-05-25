@@ -1,6 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
 import type { SpotifyArtist, SpotifyTrack, SpotifyAudioFeatures } from "./spotify";
 import type { Personality } from "@/types/next-auth";
+import { Sentry } from "./sentry";
+import { PersonalitySchema, SAFE_DEFAULTS, ARCHETYPES } from "./schemas/personality";
 
 if (!process.env.GEMINI_API_KEY) {
   throw new Error("Missing env.GEMINI_API_KEY");
@@ -8,100 +10,64 @@ if (!process.env.GEMINI_API_KEY) {
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-// Validate hex color format
-function isValidHexColor(color: string): boolean {
-  return /^#([0-9A-Fa-f]{6}|[0-9A-Fa-f]{3})$/.test(color);
-}
+const GEMINI_TIMEOUT_MS = 15_000;
+const MAX_RETRIES = 3;
+const SYSTEM_INSTRUCTION =
+  "You are an expert music psychologist and behavioral analyst. "
+  + "Analyze the user's listening data and assign exactly one of the provided archetypes. "
+  + "Only use information present in the user's data — do not invent genres, artists, or traits. "
+  + "The listeningAura must be a valid 6-digit hex color like #RRGGBB. "
+  + "The chaosIndex must be a number 0-100 formatted as 'N%'. "
+  + "Return ONLY the JSON object with no additional text, markdown, or code fences.";
 
-// Validate and sanitize AI output to prevent injection attacks
-function validatePersonalityOutput(data: Record<string, unknown>): Personality {
-  const safeDefaults = {
-    primaryArchetype: "The Midnight Dreamer",
-    secondaryTrait: "Introspective listening",
-    listeningAura: "#8A2BE2",
-    summary: "Your music taste reflects a unique personal journey.",
-    chaosIndex: "50%"
-  };
-
-  if (typeof data !== "object" || data === null) {
-    return safeDefaults;
+function isTransientError(error: unknown): boolean {
+  if (error instanceof DOMException && error.name === "AbortError") {
+    return true;
   }
 
-  const validated: Record<string, string> = {};
-
-  // Validate primaryArchetype - must be in ARCHETYPES
-  const archetype = data.primaryArchetype;
-  if (typeof archetype === "string" && ARCHETYPES.includes(archetype)) {
-    validated.primaryArchetype = archetype;
-  } else {
-    validated.primaryArchetype = safeDefaults.primaryArchetype;
+  if (error instanceof TypeError) {
+    return true;
   }
 
-  // Validate secondaryTrait - must be short plaintext
-  const trait = data.secondaryTrait;
-  if (typeof trait === "string" && trait.length > 0 && trait.length <= 50) {
-    validated.secondaryTrait = trait.replace(/[<>]/g, "");
-  } else {
-    validated.secondaryTrait = safeDefaults.secondaryTrait;
-  }
+  if (error && typeof error === "object") {
+    const e = error as Record<string, unknown>;
 
-  // Validate listeningAura - must be valid hex color
-  const aura = data.listeningAura;
-  if (typeof aura === "string" && isValidHexColor(aura)) {
-    validated.listeningAura = aura;
-  } else {
-    validated.listeningAura = safeDefaults.listeningAura;
-  }
-
-  // Validate summary - must be plaintext, limited length
-  const summary = data.summary;
-  if (typeof summary === "string" && summary.length > 0 && summary.length <= 500) {
-    validated.summary = summary.replace(/<[^>]*>/g, "").slice(0, 500);
-  } else {
-    validated.summary = safeDefaults.summary;
-  }
-
-  // Validate chaosIndex - must be percentage string 0-100%
-  const chaos = data.chaosIndex;
-  if (typeof chaos === "string") {
-    const match = chaos.match(/^(\d{1,3})%?$/);
-    if (match) {
-      const num = parseInt(match[1], 10);
-      if (num >= 0 && num <= 100) {
-        validated.chaosIndex = `${num}%`;
-      } else {
-        validated.chaosIndex = safeDefaults.chaosIndex;
-      }
-    } else {
-      validated.chaosIndex = safeDefaults.chaosIndex;
+    // @google/genai ApiError has numeric `status` (429, 503)
+    if (typeof e.status === "number") {
+      return e.status === 429 || e.status === 503;
     }
-  } else {
-    validated.chaosIndex = safeDefaults.chaosIndex;
+
+    // @google/genai ApiError may have string status like "RESOURCE_EXHAUSTED"
+    if (typeof e.status === "string") {
+      return e.status === "RESOURCE_EXHAUSTED" || e.status === "UNAVAILABLE";
+    }
+
+    // Fallback: check message JSON for code field
+    if (typeof e.message === "string") {
+      try {
+        const parsed = JSON.parse(e.message);
+        const code = parsed?.error?.code;
+        return code === 429 || code === 503;
+      } catch {
+        // not JSON, ignore
+      }
+    }
   }
 
-  return (validated as unknown) as Personality;
+  return false;
 }
 
-export const ARCHETYPES = [
-  "The Midnight Dreamer",
-  "The Sonic Explorer",
-  "The Emotional Archivist",
-  "The Chaos Listener",
-  "The Retro Futurist",
-  "The Dopamine Runner",
-  "The Calm Philosopher",
-  "The Neon Wanderer",
-  "The Main Character",
-  "The Underground King",
-  "The Serotonin Chaser",
-  "The Bassline Bruiser"
-];
+function parsePersonality(raw: unknown): Personality {
+  const result = PersonalitySchema.safeParse(raw);
+  if (result.success) return result.data;
+  console.warn("Personality validation failed:", result.error.issues);
+  return SAFE_DEFAULTS;
+}
 
 export async function analyzePersonality(topArtists: SpotifyArtist[], topTracks: SpotifyTrack[], audioFeatures: (SpotifyAudioFeatures | null)[]) {
   const artistNames = topArtists.map((a) => a.name).join(", ");
   const genres = [...new Set(topArtists.flatMap((a) => a.genres))].slice(0, 15).join(", ");
   
-  // Calculate average audio features
   let avgEnergy = 0, avgValence = 0, avgDanceability = 0, avgAcousticness = 0;
   
   if (audioFeatures && audioFeatures.length > 0) {
@@ -113,8 +79,7 @@ export async function analyzePersonality(topArtists: SpotifyArtist[], topTracks:
   }
 
   const prompt = `
-    You are an expert music psychologist and behavioral analyst. 
-    Analyze the user's music taste based on their Spotify data and assign them exactly ONE of the following 12 Personality Archetypes:
+    Assign exactly ONE of the following 12 Personality Archetypes to this user:
     ${ARCHETYPES.join(", ")}
     
     User's Data:
@@ -125,46 +90,69 @@ export async function analyzePersonality(topArtists: SpotifyArtist[], topTracks:
     - Average Danceability (0-1): ${avgDanceability.toFixed(2)}
     - Average Acousticness (0-1): ${avgAcousticness.toFixed(2)}
     
-    Provide the output in strictly valid JSON format with the following structure:
+    Output JSON structure:
     {
-      "primaryArchetype": "One of the 12 archetypes",
+      "primaryArchetype": "One of the 12 archetypes exactly as written above",
       "secondaryTrait": "A short 2-4 word description (e.g., 'High Rhythmic Energy')",
-      "listeningAura": "A color hex code representing their vibe (e.g., '#8A2BE2')",
-      "summary": "A 2-sentence poetic but analytical summary of their music personality.",
+      "listeningAura": "A 6-digit hex color code (e.g., '#8A2BE2')",
+      "summary": "A 2-sentence poetic but analytical summary of their music personality, based only on the data above.",
       "chaosIndex": "A percentage string (e.g., '78%') representing how chaotic/eclectic their taste is."
     }
-    
-    DO NOT wrap the response in markdown blocks like \`\`\`json. Return ONLY the raw JSON string.
   `;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-      config: {
-        temperature: 0.7,
-      }
-    });
+  let lastError: unknown;
 
-    const text = response.text;
-    if (!text) {
-        throw new Error("No text returned from Gemini");
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
+
+      try {
+        const response = await ai.models.generateContent({
+          model: "gemini-2.0-flash",
+          contents: prompt,
+          config: {
+            systemInstruction: SYSTEM_INSTRUCTION,
+            temperature: 0.2,
+            maxOutputTokens: 512,
+            responseMimeType: "application/json",
+            abortSignal: controller.signal,
+          },
+        });
+
+        const text = response.text;
+        if (!text) {
+          throw new Error("No text returned from Gemini");
+        }
+        const parsed = JSON.parse(text);
+
+        return parsePersonality(parsed);
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    } catch (error) {
+      lastError = error;
+
+      if (attempt < MAX_RETRIES && isTransientError(error)) {
+        const delay = 500 * 2 ** (attempt - 1);
+        await new Promise((resolve) => setTimeout(resolve, delay));
+        continue;
+      }
+
+      break;
     }
-    // Clean up potential markdown formatting from Gemini
-    const cleanedText = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    const parsed = JSON.parse(cleanedText);
-    
-    // Validate and sanitize AI output to prevent injection attacks
-    return validatePersonalityOutput(parsed);
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    // Fallback data so the app doesn't break
-    return {
-      primaryArchetype: "The Midnight Dreamer",
-      secondaryTrait: "Late-night introspection",
-      listeningAura: "#8A2BE2",
-      summary: "Your music taste leans toward emotionally immersive late-night introspection. You find comfort in atmospheric beats.",
-      chaosIndex: "42%"
-    };
   }
+
+  if (Sentry?.captureException) {
+    Sentry.captureException(lastError);
+  }
+  console.error("Gemini API Error:", lastError);
+
+  return {
+    primaryArchetype: "The Midnight Dreamer",
+    secondaryTrait: "Late-night introspection",
+    listeningAura: "#8A2BE2",
+    summary: "Your music taste leans toward emotionally immersive late-night introspection. You find comfort in atmospheric beats.",
+    chaosIndex: "42%"
+  };
 }

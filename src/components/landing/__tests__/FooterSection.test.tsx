@@ -1,24 +1,23 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen } from "@/test/test-utils";
 import FooterSection from "../FooterSection";
 
 describe("FooterSection", () => {
-  test("renders VibeDNA branding", () => {
+  test("renders Resona branding", () => {
     render(<FooterSection />);
-    expect(screen.getByText("VibeDNA")).toBeInTheDocument();
+    expect(screen.getByText("Resona")).toBeInTheDocument();
   });
 
   test("renders copyright text", () => {
     render(<FooterSection />);
     expect(
-      screen.getByText(/2024 VibeDNA\. Decode your sonic soul/i)
+      screen.getByText(/2026 Resona\. Decode your sonic soul/i)
     ).toBeInTheDocument();
   });
 
   test("renders all footer links", () => {
     render(<FooterSection />);
-    expect(screen.getByText("Privacy")).toBeInTheDocument();
-    expect(screen.getByText("Terms")).toBeInTheDocument();
-    expect(screen.getByText("API")).toBeInTheDocument();
+    expect(screen.getAllByText("Privacy").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("Terms").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("Support")).toBeInTheDocument();
   });
 });

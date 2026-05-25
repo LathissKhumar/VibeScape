@@ -1,25 +1,49 @@
 import { NextResponse } from "next/server";
-import { Qstash } from "../../../lib/qstash";
+import type { JobType } from "../../../lib/qstash";
+import handlePersonalityJob from "../../../workers/personality/handler";
+import handleEmbeddingJob from "../../../workers/embedding/handler";
+import handleAnalyticsJob from "../../../workers/analytics/handler";
 
-// Minimal worker router — accepts POST jobs and dispatches to handlers.
+function verifyWorkerSecret(request: Request): boolean {
+  const secret = request.headers.get("x-worker-secret");
+  return secret === process.env.SUPABASE_WORKER_SECRET;
+}
+
 export async function POST(request: Request) {
+  if (!verifyWorkerSecret(request)) {
+    return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
+  }
+
   const body = await request.json().catch(() => null);
-  if (!body || !body.job) return NextResponse.json({ ok: false, error: "missing job" }, { status: 400 });
+  if (!body || !body.type) {
+    return NextResponse.json({ ok: false, error: "missing type" }, { status: 400 });
+  }
 
-  // If QStash not enabled, accept the job but do not enqueue — this is a scaffold
-  if (!Qstash) return NextResponse.json({ ok: true, note: "qstash not enabled; job accepted (noop)" }, { status: 200 });
+  const jobType = body.type as JobType;
+  const payload = body.payload as Record<string, unknown> | undefined;
 
-  // When Qstash is enabled, delegate to QStash enqueue API if available
   try {
-    // eslint-disable-next-line no-eval
-    const req: any = eval("require");
-    const { client } = req("@upstash/qstash/nextjs");
-    await client.publish(JSON.stringify(body));
-    return NextResponse.json({ ok: true }, { status: 200 });
+    switch (jobType) {
+      case "personality":
+        await handlePersonalityJob(payload ?? {});
+        return NextResponse.json({ ok: true, jobType }, { status: 200 });
+
+      case "analytics":
+        await handleAnalyticsJob(payload ?? {});
+        return NextResponse.json({ ok: true, jobType }, { status: 200 });
+
+      case "embeddings":
+        await handleEmbeddingJob(payload ?? {});
+        return NextResponse.json({ ok: true, jobType }, { status: 200 });
+
+      default:
+        return NextResponse.json({ ok: false, error: `unknown type: ${jobType}` }, { status: 400 });
+    }
   } catch (err) {
-    // If publish fails, return accepted but note the failure
-    // eslint-disable-next-line no-console
-    console.warn("qstash publish failed", err);
-    return NextResponse.json({ ok: false, error: "enqueue_failed" }, { status: 502 });
+    console.warn(`worker ${jobType} failed`, err);
+    return NextResponse.json(
+      { ok: false, error: String(err) },
+      { status: 500 }
+    );
   }
 }

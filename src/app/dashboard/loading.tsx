@@ -7,7 +7,7 @@ export default function DashboardLoading() {
       <nav className="fixed top-0 w-full z-50 bg-surface/60 backdrop-blur-3xl border-b border-glass-border">
         <div className="flex justify-between items-center px-5 md:px-16 py-4 max-w-[1440px] mx-auto">
           <div className="font-[var(--font-outfit)] text-2xl font-bold text-on-surface tracking-tight opacity-50">
-            VibeDNA
+            Resona
           </div>
           <Skeleton className="w-32 h-10 rounded-full" />
         </div>

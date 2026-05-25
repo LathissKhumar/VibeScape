@@ -63,20 +63,22 @@ function ConstellationLines({
     const byGenre: Record<string, typeof planets> = {};
     planets.forEach((p) => {
       if (!byGenre[p.genre]) byGenre[p.genre] = [];
-      byGenre[p.genre].push(p);
+      byGenre[p.genre]!.push(p);
     });
     Object.entries(byGenre).forEach(([, genrePlanets]) => {
       for (let i = 0; i < genrePlanets.length; i++) {
+        const planetA = genrePlanets[i]!;
         for (let j = i + 1; j < genrePlanets.length; j++) {
+          const planetB = genrePlanets[j]!;
           const dist = Math.sqrt(
-            (genrePlanets[i].position[0] - genrePlanets[j].position[0]) ** 2 +
-              (genrePlanets[i].position[1] - genrePlanets[j].position[1]) ** 2 +
-              (genrePlanets[i].position[2] - genrePlanets[j].position[2]) ** 2
+            (planetA.position[0] - planetB.position[0]) ** 2 +
+              (planetA.position[1] - planetB.position[1]) ** 2 +
+              (planetA.position[2] - planetB.position[2]) ** 2
           );
           if (dist < 12) {
             result.push({
-              points: [genrePlanets[i].position, genrePlanets[j].position],
-              color: getGenreColor(genrePlanets[i].genre),
+              points: [planetA.position, planetB.position],
+              color: getGenreColor(planetA.genre),
             });
           }
         }
@@ -253,7 +255,7 @@ function GenreLabel({
         anchorY="middle"
         outlineWidth={0.06}
         outlineColor="#000000"
-        font="/fonts/Inter-Regular.woff"
+        font="https://cdn.jsdelivr.net/npm/@fontsource/inter@5/files/inter-latin-400-normal.woff"
       >
         {genre.toUpperCase()}
       </Text>
@@ -457,7 +459,7 @@ function GalaxyScene({
         id: artist.id,
         name: artist.name,
         position: [x, y, z] as [number, number, number],
-        color,
+        color: color ?? "#A855F7",
         size,
         genre: getPrimaryGenre(artist),
         genres: artist.genres,
@@ -469,7 +471,7 @@ function GalaxyScene({
     const byGenre: Record<string, typeof p> = {};
     p.forEach((planet) => {
       if (!byGenre[planet.genre]) byGenre[planet.genre] = [];
-      byGenre[planet.genre].push(planet);
+      byGenre[planet.genre]!.push(planet);
     });
     Object.entries(byGenre).forEach(([genre, planets]) => {
       const avgX = planets.reduce((s, pl) => s + pl.position[0], 0) / planets.length;
@@ -580,7 +582,7 @@ export default function Galaxy({ topArtists }: { topArtists: SpotifyArtist[] }) 
 
       <button
         onClick={() => setAutoRotate((v) => !v)}
-        className="absolute top-4 left-4 z-20 p-2 rounded-full glass-card border border-white/10 text-white/70 hover:text-white hover:border-white/30 transition-all"
+        className="absolute top-4 left-4 z-20 min-w-12 min-h-12 flex items-center justify-center rounded-full glass-card border border-white/10 text-white/70 hover:text-white hover:border-white/30 transition-all"
         aria-label={autoRotate ? "Disable auto-rotate" : "Enable auto-rotate"}
       >
         {autoRotate ? <RotateCw size={18} /> : <RotateCcw size={18} />}
@@ -593,7 +595,7 @@ export default function Galaxy({ topArtists }: { topArtists: SpotifyArtist[] }) 
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 10, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="absolute bottom-6 left-6 z-20 w-72 glass-card rounded-xl p-5 shadow-2xl shadow-black/40 border border-white/10"
+            className="absolute bottom-6 left-4 right-4 md:left-6 md:right-auto md:w-72 z-20 glass-card rounded-xl p-5 shadow-2xl shadow-black/40 border border-white/10"
           >
             <div className="flex items-start justify-between mb-3">
               <h3 className="font-[var(--font-outfit)] text-xl font-semibold text-white">
@@ -601,7 +603,7 @@ export default function Galaxy({ topArtists }: { topArtists: SpotifyArtist[] }) 
               </h3>
               <button
                 onClick={() => setSelectedId(null)}
-                className="p-1 rounded-full hover:bg-white/10 transition-colors text-white/60 hover:text-white"
+                className="min-w-10 min-h-10 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors text-white/60 hover:text-white"
                 aria-label="Close"
               >
                 <X size={16} />

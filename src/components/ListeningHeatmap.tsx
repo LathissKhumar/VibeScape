@@ -156,7 +156,7 @@ export default function ListeningHeatmap({
           {heatmapData.map((row: number[], dayIdx: number) => (
             <div key={dayIdx} className="flex gap-2 h-7 items-center">
               <span className="w-10 text-xs text-outline font-semibold shrink-0">
-                {DAYS[dayIdx]}
+                {DAYS[dayIdx]!}
               </span>
               <div className="flex-1 grid grid-cols-24 gap-1">
                 {row.map((intensity: number, hourIdx: number) => (
@@ -169,7 +169,7 @@ export default function ListeningHeatmap({
                       delay: dayIdx * 0.05 + hourIdx * 0.01,
                     }}
                     className={`rounded-sm ${getHeatmapColor(intensity)} ${getHeatmapGlow(intensity)} transition-all hover:scale-125 hover:z-10 cursor-pointer`}
-                    title={`${DAYS[dayIdx]} ${String(hourIdx).padStart(2, "0")}:00 — ${Math.round(intensity * 100)}% intensity`}
+                    title={`${DAYS[dayIdx]!} ${String(hourIdx).padStart(2, "0")}:00 — ${Math.round(intensity * 100)}% intensity`}
                   />
                 ))}
               </div>
@@ -315,7 +315,7 @@ export default function ListeningHeatmap({
                 Listening duration intensity
               </p>
             </div>
-            <button className="text-sm text-primary border border-primary/30 px-4 py-2 rounded-lg hover:bg-primary/10 transition-colors font-medium">
+            <button className="text-sm text-primary border border-primary/30 px-4 py-2 md:py-2 min-h-11 flex items-center rounded-lg hover:bg-primary/10 transition-colors font-medium">
               Export Report
             </button>
           </div>
@@ -340,7 +340,7 @@ export default function ListeningHeatmap({
                     i === maxPulseIdx ? "text-neon-cyan" : "text-outline"
                   }`}
                 >
-                  {DAYS[i].slice(0, 3).toUpperCase()}
+                  {DAYS[i]!.slice(0, 3).toUpperCase()}
                 </p>
               </div>
             ))}

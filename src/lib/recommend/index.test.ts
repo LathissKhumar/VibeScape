@@ -119,7 +119,7 @@ describe("findMusicTwins", () => {
   const candidates = [
     { id: "1", name: "Twin A", profile: { genres: ["rock", "indie"], topArtists: ["Radiohead", "Foo Fighters"] } },
     { id: "2", name: "Twin B", profile: { genres: ["classical", "jazz"], topArtists: ["Mozart", "Coltrane"] } },
-    { id: "3", name: "Twin C", profile: { genres: ["rock", "alternative", "indie"], topArtists: ["Tame Impala", "Arctic Monkeys", "Radiohead"] } },
+    { id: "3", name: "Twin C", profile: { genres: ["rock", "alternative"], topArtists: ["Tame Impala", "Arctic Monkeys"] } },
     { id: "4", name: "Twin D", profile: { genres: ["pop", "dance"], topArtists: ["Taylor Swift", "Dua Lipa"] } },
   ];
 

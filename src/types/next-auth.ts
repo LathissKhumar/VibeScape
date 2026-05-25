@@ -1,14 +1,5 @@
-import { DefaultSession } from "next-auth";
-
-declare module "next-auth" {
-  interface Session {
-    user: {
-      id: string;
-    } & DefaultSession["user"];
-    accessToken: string;
-    error?: string;
-  }
-}
+// Module augmentation for next-auth Session lives in types/next-auth.d.ts
+// (root-level .d.ts file for proper TypeScript declaration merging)
 
 export interface Personality {
   primaryArchetype: string;

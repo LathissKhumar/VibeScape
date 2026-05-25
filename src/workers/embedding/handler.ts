@@ -1,11 +1,20 @@
-import { emitEvent } from "../../lib/events";
+import { computeProfileEmbedding } from "../../lib/embeddings-core";
+import { upsertEmbedding } from "../../lib/embeddings";
 
-// Minimal embedding worker scaffold — handles embedding requests.
-export default async function handleEmbeddingJob(payload: any) {
-  try {
-    await emitEvent("generic", { job: "embedding_processed", payload });
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.error("embedding job error", err);
+interface EmbeddingPayload {
+  entityType: string;
+  entityId: string;
+  genres: string[];
+  topArtists: string[];
+}
+
+export default async function handleEmbeddingJob(payload: unknown) {
+  const { entityType, entityId, genres, topArtists } = payload as EmbeddingPayload;
+
+  if (!entityType || !entityId) {
+    throw new Error("Invalid embedding job payload: missing entityType or entityId");
   }
+
+  const vector = computeProfileEmbedding(genres ?? [], topArtists ?? []);
+  await upsertEmbedding(entityType, entityId, vector);
 }

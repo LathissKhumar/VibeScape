@@ -1,42 +1,26 @@
-import { render, screen } from "@testing-library/react";
-import { vi } from "vitest";
+import { render, screen } from "@/test/test-utils";
 import HeroSection from "../HeroSection";
-
-vi.mock("next-auth/react", () => ({
-  signIn: vi.fn(),
-}));
-
-vi.mock("@/hooks/useReducedMotion", () => ({
-  default: () => false,
-}));
 
 describe("HeroSection", () => {
   test("renders heading text", () => {
-    render(<HeroSection />);
-    expect(
-      screen.getByText(/Make people obsessed with/i)
-    ).toBeInTheDocument();
+    const { container } = render(<HeroSection />);
+    expect(container.textContent).toContain("DecodeYourSonicSoul");
   });
 
-  test("renders gradient text span", () => {
+  test("renders badge text", () => {
     render(<HeroSection />);
-    expect(screen.getByText("discovering themselves")).toBeInTheDocument();
+    expect(screen.getByText("AI-Powered Listening Intelligence")).toBeInTheDocument();
   });
 
   test("renders description paragraph", () => {
     render(<HeroSection />);
     expect(
-      screen.getByText(/VibeDNA decodes your listening habits/i)
+      screen.getByText(/AI-powered YouTube Music listening intelligence/i)
     ).toBeInTheDocument();
   });
 
-  test("renders Connect with Spotify button", () => {
+  test("renders Connect with YouTube Music button", () => {
     render(<HeroSection />);
-    expect(screen.getByText("Connect with Spotify")).toBeInTheDocument();
-  });
-
-  test("renders Explore Galaxy link", () => {
-    render(<HeroSection />);
-    expect(screen.getByText("Explore Galaxy")).toBeInTheDocument();
+    expect(screen.getByText("Connect with YouTube Music")).toBeInTheDocument();
   });
 });

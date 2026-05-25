@@ -11,8 +11,8 @@ export async function POST(request: Request) {
   // Signature verification is optional; attempt it but proceed if not available
   try {
     // eslint-disable-next-line no-eval
-    const req: any = eval("require");
-    const { verifyRequestSignature } = req("@upstash/qstash/nextjs");
+    const req: (id: string) => unknown = eval("require");
+    const { verifyRequestSignature } = req("@upstash/qstash/nextjs") as { verifyRequestSignature: (req: Request) => Promise<boolean> };
     const signatureValid = await verifyRequestSignature(request);
     if (!signatureValid) return NextResponse.json({ error: "invalid signature" }, { status: 401 });
   } catch (err) {
