@@ -192,15 +192,6 @@ This secret must match between the app and any Edge Functions you deploy.
 After completing steps 1-6, your `.env.local` should look like this:
 
 ```env
-# --- Existing (preserved) ---
-SPOTIFY_CLIENT_ID=9238aefaa01b49c1a5d2d3168bc6e93d
-SPOTIFY_CLIENT_SECRET=c3f290f47331492e879bce339c2531fb
-NEXT_PUBLIC_SUPABASE_URL=https://ikmpbfmattuecerbqrhe.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_jOPoDp4qtlB--DRrQ3PBgw_IkqO9NxP
-GEMINI_API_KEY=AIzaSyC-1hrU8n21yp82Wd6TTZv_2ctnUfOYeZA
-NEXTAUTH_SECRET=F8b3rhtSgzjmeArxQzdJK84RQ2QFxjnxEa8yhMTSMk0=
-NEXTAUTH_URL=http://localhost:3000
-
 # --- New (fill these in) ---
 SUPABASE_DB_URL=postgresql://postgres:YOUR_PASSWORD@db.ikmpbfmattuecerbqrhe.supabase.co:5432/postgres
 SUPABASE_SERVICE_ROLE_KEY=eyJ...
